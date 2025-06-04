@@ -1,0 +1,30 @@
+{
+	"node": "n8n-nodes-base.ScrapeOps",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": [
+		"Data & Storage",
+		"Development",
+		"Internet"
+	],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://scrapeops.io/docs/web-scraping-proxy-api-aggregator/getting-started/api-basics/"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://scrapeops.io/docs/intro/"
+			}
+		]
+	},
+	"subcategories": {
+		"Data & Storage": [
+			"Data Processing"
+		],
+		"Internet": [
+			"Web Scraping"
+		]
+	}
+}
