@@ -19,13 +19,12 @@ export class ParserApi {
             apiType: ['parserApi'],
           },
         },
-        // eslint-disable-next-line n8n-nodes-base/node-param-options-type-unsorted-items
         options: [
           { name: 'Amazon', value: 'amazon' },
           { name: 'eBay', value: 'ebay' },
-          { name: 'Walmart', value: 'walmart' },
           { name: 'Indeed', value: 'indeed' },
           { name: 'Redfin', value: 'redfin' },
+          { name: 'Walmart', value: 'walmart' },
         ],
         default: 'amazon',
         description: 'Domain to parse or select Custom Domain for custom parsing',
@@ -58,7 +57,6 @@ export class ParserApi {
             parserDomain: ['ebay'],
           },
         },
-        // eslint-disable-next-line n8n-nodes-base/node-param-options-type-unsorted-items
         options: [
           { name: 'Category Page', value: 'category' },
           { name: 'Feedback Page', value: 'feedback' },
@@ -79,7 +77,7 @@ export class ParserApi {
             parserDomain: ['walmart'],
           },
         },
-        // eslint-disable-next-line n8n-nodes-base/node-param-options-type-unsorted-items
+
         options: [
           { name: 'Browse Page', value: 'browse' },
           { name: 'Category Page', value: 'category' },

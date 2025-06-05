@@ -209,10 +209,6 @@ export class ProxyApi {
       url: url,
     };
 
-    // Note: Some parameter names in the API differ from our node option names:
-    // - premium_proxy (option name) -> premium (API parameter)
-    // - residential_proxy (option name) -> residential (API parameter)
-    // - mobile_proxy (option name) -> mobile (API parameter)
     if (advancedOptions.render_js !== undefined) queryParams.render_js = advancedOptions.render_js;
     if (advancedOptions.country) queryParams.country = advancedOptions.country;
     if (advancedOptions.follow_redirects !== undefined) queryParams.follow_redirects = advancedOptions.follow_redirects;

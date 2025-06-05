@@ -4,15 +4,16 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	NodeConnectionType,
+	NodeOperationError,
 } from 'n8n-workflow';
 
 import { ProxyApi, ParserApi, DataApi, IScrapeOpsApiOptions } from './api';
 
 export class ScrapeOps implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'ScrapeOps',
 		// eslint-disable-next-line n8n-nodes-base/node-class-description-name-miscased
 		name: 'ScrapeOps',
+		displayName: 'ScrapeOps',
 		icon: 'file:scrapeops.svg',
 		group: ['transform'],
 		version: 1,
@@ -66,6 +67,14 @@ export class ScrapeOps implements INodeType {
 				const apiType = this.getNodeParameter('apiType', i) as string;
 				const credentials = await this.getCredentials('ScrapeOpsApi') as unknown as IScrapeOpsApiOptions;
 
+				if (!credentials.apiKey) {
+					throw new NodeOperationError(
+						this.getNode(),
+						'A valid API key is required. Please check your ScrapeOps API credentials.',
+						{ itemIndex: i }
+					);
+				}
+
 				let responseData;
 
 				if (apiType === 'proxyApi') {
@@ -76,6 +85,13 @@ export class ScrapeOps implements INodeType {
 				}
 				else if (apiType === 'dataApi') {
 					responseData = await DataApi.execute.call(this, i, credentials);
+				}
+				else {
+					throw new NodeOperationError(
+						this.getNode(),
+						`Unsupported API type: ${apiType}. Please select a valid API type.`,
+						{ itemIndex: i }
+					);
 				}
 
 				returnData.push({
@@ -88,6 +104,7 @@ export class ScrapeOps implements INodeType {
 					returnData.push({
 						json: {
 							error: error.message,
+							suggestion: 'Check your ScrapeOps credentials and parameters. If the error persists, contact ScrapeOps support.',
 						},
 						pairedItem: { item: i },
 					});

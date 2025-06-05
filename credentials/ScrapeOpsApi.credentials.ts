@@ -7,7 +7,6 @@ import {
 export class ScrapeOpsApi implements ICredentialType {
 	// eslint-disable-next-line n8n-nodes-base/cred-class-field-name-uppercase-first-char
 	name = 'ScrapeOpsApi';
-	// eslint-disable-next-line n8n-nodes-base/cred-class-field-display-name-missing-oauth2
 	displayName = 'ScrapeOps API';
 	documentationUrl = 'https://scrapeops.io/app/register/proxy/';
 	properties: INodeProperties[] = [
@@ -22,7 +21,6 @@ export class ScrapeOpsApi implements ICredentialType {
 		},
 	];
 
-	// eslint-disable-next-line n8n-nodes-base/cred-class-field-authenticate-type-assertion
 	authenticate: IAuthenticateGeneric = {
 		type: 'generic',
 		properties: {

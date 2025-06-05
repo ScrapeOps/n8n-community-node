@@ -15,7 +15,7 @@ ScrapeOps provides a suite of tools to simplify web scraping operations:
 Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
 ```bash
-npm install n8n-nodes-scrapeops
+npm install @scrapeops/n8n-nodes-scrapeops
 ```
 
 ## Features
@@ -31,13 +31,11 @@ npm install n8n-nodes-scrapeops
 
 - Parse HTML from a URL or direct HTML content
 - Define extraction rules for structured data
-- Configure parsing options like JavaScript rendering
 
 ### Data API
 
 - Retrieve complete datasets from ScrapeOps
 - Execute custom queries against datasets
-- Control format, limits, and offsets
 
 ## Credentials
 
