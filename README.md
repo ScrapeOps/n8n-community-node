@@ -39,7 +39,7 @@ npm install @scrapeops/n8n-nodes-scrapeops
 
 ## Credentials
 
-To use this node, you'll need a ScrapeOps API key. You can get one by signing up at [ScrapeOps](https://scrapeops.io/app/register/proxy/) and visiting your dashboard at [https://scrapeops.io/app/dashboard](https://scrapeops.io/app/dashboard).
+To use this node, you'll need a ScrapeOps API key. You can get one by signing up at [ScrapeOps](https://scrapeops.io/app/register/proxy/) and visiting your dashboard at [Dashboard](https://scrapeops.io/app/dashboard).
 
 ![ScrapeOps Dashboard](./images/scrapeops-dashboard.png)
 
