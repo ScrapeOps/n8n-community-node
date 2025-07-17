@@ -1,5 +1,6 @@
 import {
 	IAuthenticateGeneric,
+	ICredentialTestRequest,
 	ICredentialType,
 	INodeProperties,
 } from 'n8n-workflow';
@@ -26,6 +27,19 @@ export class ScrapeOpsApi implements ICredentialType {
 		properties: {
 			qs: {
 				'api_key': '={{$credentials.apiKey}}'
+			}
+		},
+	};
+
+	// credential test request
+	test: ICredentialTestRequest = {
+		request: {
+			method: 'GET',
+			baseURL: 'https://proxy.scrapeops.io/v1/',
+			url: '',
+			qs: {
+				'api_key': '={{$credentials.apiKey}}',
+				'url': 'https://httpbin.org/ip'
 			}
 		},
 	};
