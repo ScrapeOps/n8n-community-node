@@ -23,10 +23,11 @@ export class ScrapeOps implements INodeType {
 			name: 'ScrapeOps',
 		},
 		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+			outputs: [NodeConnectionType.Main],
+			usableAsTool: true,
 		credentials: [
 			{
-				name: 'ScrapeOpsApi',
+				name: 'scrapeOpsApi',
 				required: true,
 			},
 		],
@@ -65,7 +66,7 @@ export class ScrapeOps implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				const apiType = this.getNodeParameter('apiType', i) as string;
-				const credentials = await this.getCredentials('ScrapeOpsApi') as unknown as IScrapeOpsApiOptions;
+				const credentials = await this.getCredentials('scrapeOpsApi') as unknown as IScrapeOpsApiOptions;
 
 				if (!credentials.apiKey) {
 					throw new NodeOperationError(

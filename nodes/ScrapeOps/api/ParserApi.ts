@@ -198,13 +198,10 @@ export class ParserApi {
       url: parserEndpoint,
       body: requestBody,
       json: true,
-      qs: {
-        api_key: credentials.apiKey,
-      },
     };
 
     try {
-      const responseData = await this.helpers.request(options);
+      const responseData = await this.helpers.requestWithAuthentication.call(this, 'scrapeOpsApi', options);
       return responseData;
     } catch (error) {
       if (error.response && error.response.body) {

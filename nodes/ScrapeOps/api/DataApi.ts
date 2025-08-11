@@ -228,10 +228,10 @@ export class DataApi {
     const amazonApiOptions = this.getNodeParameter('amazonApiOptions', index, {}) as IAmazonApiOptions;
 
     let baseUrl = '';
-    let queryParams = `api_key=${credentials.apiKey}`;
+    const qsParams: Record<string, any> = {};
 
-    if (amazonApiOptions.country) queryParams += `&country=${amazonApiOptions.country}`;
-    if (amazonApiOptions.tld) queryParams += `&tld=${amazonApiOptions.tld}`;
+    if (amazonApiOptions.country) qsParams.country = amazonApiOptions.country;
+    if (amazonApiOptions.tld) qsParams.tld = amazonApiOptions.tld;
 
     if (amazonApiType === 'product') {
       baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/amazon/product';
@@ -240,10 +240,10 @@ export class DataApi {
 
       if (inputType === 'asin') {
         const asin = this.getNodeParameter('amazonProductAsin', index) as string;
-        queryParams += `&asin=${asin}`;
+        qsParams.asin = asin;
       } else if (inputType === 'url') {
         const url = this.getNodeParameter('amazonProductUrl', index) as string;
-        queryParams += `&url=${url}`;
+        qsParams.url = url;
       }
     } else if (amazonApiType === 'search') {
       baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/amazon/search';
@@ -252,23 +252,22 @@ export class DataApi {
 
       if (inputType === 'query') {
         const query = this.getNodeParameter('amazonSearchQuery', index) as string;
-        queryParams += `&query=${query}`;
+        qsParams.query = query;
       } else if (inputType === 'url') {
         const url = this.getNodeParameter('amazonSearchUrl', index) as string;
-        queryParams += `&url=${url}`;
+        qsParams.url = url;
       }
     }
 
-    const finalUrl = `${baseUrl}?${queryParams}`;
-
     const options: IRequestOptions = {
       method: 'GET' as IHttpRequestMethods,
-      url: finalUrl,
+      url: baseUrl,
+      qs: qsParams,
       json: true,
     };
 
     try {
-      const responseData = await this.helpers.request(options);
+      const responseData = await this.helpers.requestWithAuthentication.call(this, 'scrapeOpsApi', options);
       return responseData;
     } catch (error) {
       if (error.response && error.response.body) {
