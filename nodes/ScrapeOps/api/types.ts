@@ -27,6 +27,9 @@ export interface IProxyAdvancedOptions {
   keep_headers?: boolean;
   device_type?: string;
   session_number?: number;
+  llm_extract?: boolean;
+  llm_extract_response_type?: string;
+  llm_data_schema?: string;
 }
 
 export interface IAmazonApiOptions {

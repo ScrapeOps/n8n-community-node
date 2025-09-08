@@ -181,6 +181,54 @@ export class ProxyApi {
             default: false,
             description: 'Whether to use your custom headers when making the request',
           },
+
+          {
+            displayName: 'LLM Data Schema',
+            name: 'llm_data_schema',
+            type: 'options',
+            options: [
+              { name: 'Company Job Page', value: 'company_job_page' },
+              { name: 'Company Location Page', value: 'company_location_page' },
+              { name: 'Company Page', value: 'company_page' },
+              { name: 'Company Review Page', value: 'company_review_page' },
+              { name: 'Company Search Page', value: 'company_search_page' },
+              { name: 'Company Social Media Page', value: 'company_social_media_page' },
+              { name: 'Job Advert Page', value: 'job_advert_page' },
+              { name: 'Job Page', value: 'job_page' },
+              { name: 'Job Search Page', value: 'job_search_page' },
+              { name: 'Product Page', value: 'product_page' },
+              { name: 'Product Reviews Page', value: 'product_reviews_page' },
+              { name: 'Product Search Page', value: 'product_search_page' },
+              { name: 'Product Seller Page', value: 'product_seller_page' },
+              { name: 'Real Estate Page', value: 'real_estate_page' },
+              { name: 'Real Estate Profile Page', value: 'real_estate_profile_page' },
+              { name: 'Real Estate Search Page', value: 'real_estate_search_page' },
+              { name: 'Search Engine Results Page', value: 'serp_search_page' },
+            ],
+            default: 'product_page',
+            description: 'Page type for optimized extraction',
+          },
+
+          {
+            displayName: 'LLM Extract',
+            name: 'llm_extract',
+            type: 'boolean',
+            default: false,
+            description: 'Whether to enable LLM extraction for intelligent content parsing',
+          },
+
+          {
+            displayName: 'LLM Extract Response Type',
+            name: 'llm_extract_response_type',
+            type: 'options',
+            options: [
+              { name: 'JSON', value: 'json' },
+              { name: 'Markdown', value: 'markdown' },
+            ],
+            default: 'json',
+            description: 'Format of the extracted data',
+          },
+
           {
             displayName: 'Max Request Cost',
             name: 'max_request_cost',
@@ -337,6 +385,10 @@ export class ProxyApi {
     if (advancedOptions.keep_headers !== undefined) queryParams.keep_headers = advancedOptions.keep_headers;
     if (advancedOptions.device_type) queryParams.device_type = advancedOptions.device_type;
     if (advancedOptions.session_number) queryParams.session_number = advancedOptions.session_number;
+
+    if (advancedOptions.llm_extract !== undefined) queryParams.llm_extract = advancedOptions.llm_extract;
+    if (advancedOptions.llm_extract_response_type) queryParams.llm_extract_response_type = advancedOptions.llm_extract_response_type;
+    if (advancedOptions.llm_data_schema) queryParams.llm_data_schema = advancedOptions.llm_data_schema;
 
     if (returnType === 'json') {
       queryParams.json_response = true;
