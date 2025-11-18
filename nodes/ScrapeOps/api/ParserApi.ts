@@ -58,35 +58,6 @@ export class ParserApi {
         required: true,
         description: 'HTML content to parse',
       },
-      {
-        displayName: 'URL',
-        name: 'parserUrl',
-        type: 'string',
-        displayOptions: {
-          show: {
-            apiType: ['parserApi'],
-          },
-        },
-        default: '',
-        required: true,
-        description: 'URL of the page being parsed',
-      },
-      {
-        displayName: 'HTML Content',
-        name: 'parserHtml',
-        type: 'string',
-        typeOptions: {
-          rows: 8,
-        },
-        displayOptions: {
-          show: {
-            apiType: ['parserApi'],
-          },
-        },
-        default: '',
-        required: true,
-        description: 'HTML content to parse',
-      },
     ];
   }
 
