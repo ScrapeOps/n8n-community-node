@@ -36,3 +36,22 @@ export interface IAmazonApiOptions {
   country?: string;
   tld?: string;
 }
+
+export interface IIndeedApiOptions {
+  country?: string;
+  tld?: string;
+  location?: string;
+  industry?: string;
+  job_type?: string;
+  sort?: string;
+  start?: number;
+  radius?: number;
+  fromage?: number;
+  salary?: string;
+  remote?: string;
+}
+
+export interface IRedfinApiOptions {
+  country?: string;
+  tld?: string;
+}
