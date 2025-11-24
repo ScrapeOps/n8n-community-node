@@ -20,10 +20,10 @@ export class DataApi {
           },
         },
         options: [
-          // { name: 'Amazon', value: 'amazon' },
+          { name: 'Amazon', value: 'amazon' },
           { name: 'Walmart', value: 'walmart' },
         ],
-        default: 'Test',
+        default: 'amazon',
         description: 'Domain data to retrieve',
       },
       {
@@ -229,6 +229,16 @@ export class DataApi {
         },
         options: [
           {
+            name: 'Browse API',
+            value: 'browse',
+            description: 'Retrieve data for a Walmart browse page by Browse Path or URL',
+          },
+          {
+            name: 'Category API',
+            value: 'category',
+            description: 'Retrieve data for a Walmart category by Category ID or URL',
+          },
+          {
             name: 'Product API',
             value: 'product',
             description: 'Get data for a specific Walmart product by Product ID or URL',
@@ -247,16 +257,6 @@ export class DataApi {
             name: 'Shop API',
             value: 'shop',
             description: 'Retrieve data for a Walmart Shop by Shop ID or URL',
-          },
-          {
-            name: 'Browse API',
-            value: 'browse',
-            description: 'Retrieve data for a Walmart browse page by Browse Path or URL',
-          },
-          {
-            name: 'Category API',
-            value: 'category',
-            description: 'Retrieve data for a Walmart category by Category ID or URL',
           },
         ],
         default: 'product',
@@ -578,11 +578,11 @@ export class DataApi {
             name: 'tld',
             type: 'options',
             options: [
-              { name: '.COM (USA)', value: 'com' },
               { name: '.CA (Canada)', value: 'ca' },
-              { name: '.COM.MX (Mexico)', value: 'com.mx' },
               { name: '.CL (Chile)', value: 'cl' },
+              { name: '.COM (USA)', value: 'com' },
               { name: '.COM.BR (Brazil)', value: 'com.br' },
+              { name: '.COM.MX (Mexico)', value: 'com.mx' },
             ],
             default: 'com',
             description: 'The Walmart domain to scrape from',
