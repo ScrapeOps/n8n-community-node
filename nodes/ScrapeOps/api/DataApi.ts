@@ -729,7 +729,7 @@ export class DataApi {
           qsParams.url = url;
         }
       } else if (walmartApiType === 'review') {
-        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/walmart/review';
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/walmart/reviews';
 
         const inputType = this.getNodeParameter('walmartReviewInputType', index) as string;
 
