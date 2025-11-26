@@ -21,6 +21,7 @@ export class DataApi {
         },
         options: [
           { name: 'Amazon', value: 'amazon' },
+          { name: 'eBay', value: 'ebay' },
         ],
         default: 'amazon',
         description: 'Domain data to retrieve',
@@ -216,6 +217,336 @@ export class DataApi {
           },
         ],
       },
+      {
+        displayName: 'eBay API Type',
+        name: 'ebayApiType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+          },
+        },
+        options: [
+          {
+            name: 'Product API',
+            value: 'product',
+            description: 'Retrieve structured data for a specific eBay listing',
+          },
+          {
+            name: 'Search API',
+            value: 'search',
+            description: 'Retrieve structured search results for an eBay keyword or URL',
+          },
+          {
+            name: 'Feedback API',
+            value: 'feedback',
+            description: 'Retrieve seller or buyer feedback data from eBay profiles',
+          },
+          {
+            name: 'Category API',
+            value: 'category',
+            description: 'Retrieve structured product listings from eBay category pages',
+          },
+          {
+            name: 'Store API',
+            value: 'store',
+            description: 'Retrieve structured data from eBay storefronts by name or URL',
+          },
+        ],
+        default: 'product',
+        description: 'Type of eBay API to use',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebayProductInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['product'],
+          },
+        },
+        options: [
+          {
+            name: 'Item ID',
+            value: 'itemId',
+            description: 'Unique eBay item ID (e.g. 155616449358)',
+          },
+          {
+            name: 'Product URL',
+            value: 'url',
+            description: 'Full eBay product URL (encoded if necessary)',
+          },
+        ],
+        default: 'itemId',
+        description: 'Type of input for the eBay Product API request',
+      },
+      {
+        displayName: 'Item ID',
+        name: 'ebayProductItemId',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['product'],
+            ebayProductInputType: ['itemId'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'eBay item ID for the product you want to retrieve',
+      },
+      {
+        displayName: 'Product URL',
+        name: 'ebayProductUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['product'],
+            ebayProductInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full eBay product URL (remember to URL encode before sending)',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebaySearchInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['search'],
+          },
+        },
+        options: [
+          {
+            name: 'Query',
+            value: 'query',
+            description: 'Keyword or phrase to search for on eBay',
+          },
+          {
+            name: 'Search URL',
+            value: 'url',
+            description: 'Full eBay search results URL (URL encode before sending)',
+          },
+        ],
+        default: 'query',
+        description: 'Type of input for the eBay Search API request',
+      },
+      {
+        displayName: 'Search Query',
+        name: 'ebaySearchQuery',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['search'],
+            ebaySearchInputType: ['query'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Keyword or phrase to search for on eBay (e.g., laptop, sneakers)',
+      },
+      {
+        displayName: 'Search URL',
+        name: 'ebaySearchUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['search'],
+            ebaySearchInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full eBay search page URL (remember to URL encode before sending)',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebayFeedbackInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['feedback'],
+          },
+        },
+        options: [
+          {
+            name: 'Username',
+            value: 'username',
+            description: 'eBay username whose feedback page should be scraped',
+          },
+          {
+            name: 'Feedback URL',
+            value: 'url',
+            description: 'Full eBay feedback page URL (URL encode before sending)',
+          },
+        ],
+        default: 'username',
+        description: 'Type of input for the eBay Feedback API request',
+      },
+      {
+        displayName: 'Username',
+        name: 'ebayFeedbackUsername',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['feedback'],
+            ebayFeedbackInputType: ['username'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Exact eBay username to retrieve feedback for',
+      },
+      {
+        displayName: 'Feedback URL',
+        name: 'ebayFeedbackUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['feedback'],
+            ebayFeedbackInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full eBay feedback page URL (remember to URL encode before sending)',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebayCategoryInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['category'],
+          },
+        },
+        options: [
+          {
+            name: 'Category ID',
+            value: 'categoryId',
+            description: 'eBay numeric category ID (e.g. 1648276), The Id after bn_ in the URL (https://www.ebay.com/b/Laptops/bn_1648276) is 1648276',
+          },
+          {
+            name: 'Category URL',
+            value: 'url',
+            description: 'Full eBay category page URL (URL encode before sending)',
+          },
+        ],
+        default: 'categoryId',
+        description: 'Type of input for the eBay Category API request',
+      },
+      {
+        displayName: 'Category ID',
+        name: 'ebayCategoryId',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['category'],
+            ebayCategoryInputType: ['categoryId'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'The eBay category identifier you want to scrape',
+      },
+      {
+        displayName: 'Category URL',
+        name: 'ebayCategoryUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['category'],
+            ebayCategoryInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full eBay category page URL (remember to URL encode before sending)',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebayStoreInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['store'],
+          },
+        },
+        options: [
+          {
+            name: 'Store Name',
+            value: 'storeName',
+            description: 'Public-facing eBay store name (e.g. mystore)',
+          },
+          {
+            name: 'Store URL',
+            value: 'url',
+            description: 'Full eBay store URL (URL encode before sending)',
+          },
+        ],
+        default: 'storeName',
+        description: 'Type of input for the eBay Store API request',
+      },
+      {
+        displayName: 'Store Name',
+        name: 'ebayStoreName',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['store'],
+            ebayStoreInputType: ['storeName'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Exact eBay storefront name you want to retrieve data for',
+      },
+      {
+        displayName: 'Store URL',
+        name: 'ebayStoreUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['store'],
+            ebayStoreInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full eBay store page URL (remember to URL encode before sending)',
+      },
     ];
   }
 
@@ -224,39 +555,118 @@ export class DataApi {
     index: number,
     credentials: IScrapeOpsApiOptions,
   ): Promise<any> {
-    const amazonApiType = this.getNodeParameter('amazonApiType', index) as string;
-    const amazonApiOptions = this.getNodeParameter('amazonApiOptions', index, {}) as IAmazonApiOptions;
-
+    const dataDomain = this.getNodeParameter('dataDomain', index) as string;
     let baseUrl = '';
     const qsParams: Record<string, any> = {};
 
-    if (amazonApiOptions.country) qsParams.country = amazonApiOptions.country;
-    if (amazonApiOptions.tld) qsParams.tld = amazonApiOptions.tld;
+    if (dataDomain === 'amazon') {
+      const amazonApiType = this.getNodeParameter('amazonApiType', index) as string;
+      const amazonApiOptions = this.getNodeParameter('amazonApiOptions', index, {}) as IAmazonApiOptions;
 
-    if (amazonApiType === 'product') {
-      baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/amazon/product';
+      if (amazonApiOptions.country) qsParams.country = amazonApiOptions.country;
+      if (amazonApiOptions.tld) qsParams.tld = amazonApiOptions.tld;
 
-      const inputType = this.getNodeParameter('amazonProductInputType', index) as string;
+      if (amazonApiType === 'product') {
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/amazon/product';
 
-      if (inputType === 'asin') {
-        const asin = this.getNodeParameter('amazonProductAsin', index) as string;
-        qsParams.asin = asin;
-      } else if (inputType === 'url') {
-        const url = this.getNodeParameter('amazonProductUrl', index) as string;
-        qsParams.url = url;
+        const inputType = this.getNodeParameter('amazonProductInputType', index) as string;
+
+        if (inputType === 'asin') {
+          const asin = this.getNodeParameter('amazonProductAsin', index) as string;
+          qsParams.asin = asin;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('amazonProductUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (amazonApiType === 'search') {
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/amazon/search';
+
+        const inputType = this.getNodeParameter('amazonSearchInputType', index) as string;
+
+        if (inputType === 'query') {
+          const query = this.getNodeParameter('amazonSearchQuery', index) as string;
+          qsParams.query = query;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('amazonSearchUrl', index) as string;
+          qsParams.url = url;
+        }
       }
-    } else if (amazonApiType === 'search') {
-      baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/amazon/search';
+    } else if (dataDomain === 'ebay') {
+      const ebayApiType = this.getNodeParameter('ebayApiType', index) as string;
 
-      const inputType = this.getNodeParameter('amazonSearchInputType', index) as string;
+      if (ebayApiType === 'product') {
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/ebay/product';
 
-      if (inputType === 'query') {
-        const query = this.getNodeParameter('amazonSearchQuery', index) as string;
-        qsParams.query = query;
-      } else if (inputType === 'url') {
-        const url = this.getNodeParameter('amazonSearchUrl', index) as string;
-        qsParams.url = url;
+        const inputType = this.getNodeParameter('ebayProductInputType', index) as string;
+
+        if (inputType === 'itemId') {
+          const itemId = this.getNodeParameter('ebayProductItemId', index) as string;
+          qsParams.item_id = itemId;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebayProductUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (ebayApiType === 'search') {
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/ebay/search';
+
+        const inputType = this.getNodeParameter('ebaySearchInputType', index) as string;
+
+        if (inputType === 'query') {
+          const query = this.getNodeParameter('ebaySearchQuery', index) as string;
+          qsParams.query = query;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebaySearchUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (ebayApiType === 'feedback') {
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/ebay/feedback';
+
+        const inputType = this.getNodeParameter('ebayFeedbackInputType', index) as string;
+
+        if (inputType === 'username') {
+          const username = this.getNodeParameter('ebayFeedbackUsername', index) as string;
+          qsParams.username = username;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebayFeedbackUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (ebayApiType === 'category') {
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/ebay/category';
+
+        const inputType = this.getNodeParameter('ebayCategoryInputType', index) as string;
+
+      if (inputType === 'categoryId') {  
+          const categoryId = this.getNodeParameter('ebayCategoryId', index) as string;
+          qsParams.category_id = categoryId;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebayCategoryUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (ebayApiType === 'store') {
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/ebay/store';
+
+        const inputType = this.getNodeParameter('ebayStoreInputType', index) as string;
+
+        if (inputType === 'storeName') {
+          const storeName = this.getNodeParameter('ebayStoreName', index) as string;
+          qsParams.store_name = storeName;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebayStoreUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else {
+        throw new NodeOperationError(
+          this.getNode(),
+          `Unsupported eBay API type: ${ebayApiType}. Please select product, search, feedback, category, or store.`,
+          { itemIndex: index },
+        );
       }
+    } else {
+      throw new NodeOperationError(
+        this.getNode(),
+        `Unsupported data domain: ${dataDomain}. Please select a supported domain.`,
+        { itemIndex: index },
+      );
     }
 
     const options: IRequestOptions = {
@@ -271,9 +681,10 @@ export class DataApi {
       return responseData;
     } catch (error) {
       if (error.response && error.response.body) {
+        const domainLabel = dataDomain === 'amazon' ? 'Amazon' : dataDomain === 'ebay' ? 'eBay' : 'Data';
         throw new NodeOperationError(
           this.getNode(),
-          `ScrapeOps Amazon API request failed: ${error.response.body.message || error.message}`,
+          `ScrapeOps ${domainLabel} API request failed: ${error.response.body.message || error.message}`,
           { itemIndex: index }
         );
       }

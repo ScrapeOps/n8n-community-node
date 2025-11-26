@@ -35,6 +35,11 @@ The **[ScrapeOps n8n node](https://n8n.io/integrations/scrapeops/)** is a powerf
 - Direct access to structured data endpoints
 - **[Amazon Product API](https://scrapeops.io/docs/data-api/amazon-product-api/)**: Get product details by ASIN or URL
 - **[Amazon Search API](https://scrapeops.io/docs/data-api/amazon-product-search-api/)**: Search products and get structured results
+- **eBay Product API**: Get product data from eBay listings via Item ID or product URL
+- **eBay Search API**: Query eBay search results via keywords or search URLs
+- **eBay Feedback API**: Retrieve seller or buyer feedback pages by username or URL
+- **eBay Category API**: Scrape product listings from category pages by ID or URL
+- **eBay Store API**: Capture storefront data via store name or store URL
 - No HTML scraping required - get data in a single request
 
 ---
@@ -221,9 +226,15 @@ HTML Content: {{ $node["Proxy_API"].json.body }}
 Access pre-scraped datasets, focused on Amazon.
 
 **Parameters:**
-- **Domain:** [Amazon](https://scrapeops.io/docs/data-api/overview/) (more coming soon)
+- **Domain:** Amazon or eBay
 - **Amazon API Type:** [Product](https://scrapeops.io/docs/data-api/amazon-product-api/) or [Search](https://scrapeops.io/docs/data-api/amazon-product-search-api/)
 - **Input Type:** ASIN/URL for Product; Query/URL for Search
+- **eBay Product Input:** Item ID or Product URL (URL encoded)
+- **eBay API Type:** Product, Search, Feedback, or Category
+- **eBay Search Input:** Query or Search URL (URL encoded)
+- **eBay Feedback Input:** Username or Feedback URL (URL encoded)
+- **eBay Category Input:** Category ID or Category URL (URL encoded)
+- **eBay Store Input:** Store Name or Store URL (URL encoded)
 
 **Example Configuration:**
 ```
@@ -232,6 +243,139 @@ Domain: Amazon
 Amazon API Type: Product API
 Input Type: ASIN
 ASIN: B08N5WRWNW
+```
+
+#### eBay Product API
+
+The eBay Product API lets you pull structured data from any public eBay product page via the `/ebay/product` endpoint. Provide either the `item_id` or a URL to the listing (make sure to URL encode it).
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/product?api_key=YOUR_API_KEY&item_id=123456789"
+```
+
+**Parameters:**
+- **Input Type:** Item ID or Product URL
+- **Item ID:** The numeric eBay identifier for the listing you want to scrape
+- **Product URL:** The fully qualified product URL (URL encoded before sending)
+
+**Example Configuration:**
+```
+API Type: Data API
+Domain: eBay
+Input Type: Item ID
+Item ID: 155616449358
+```
+
+#### eBay Search API
+
+The eBay Search API lets you capture structured search results from the `/ebay/search` endpoint. Provide a keyword query or pass the exact search results URL (remember to URL encode it per URL standards).
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/search?api_key=YOUR_API_KEY&query=laptop"
+```
+
+Or send the URL directly:
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/search?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.ebay.com%2Fsch%2Fi.html%3F_nkw%3Dlaptop"
+```
+
+**Parameters:**
+- **Input Type:** Query or Search URL
+- **Query:** The keyword phrase you want eBay to search for
+- **Search URL:** The fully qualified eBay search results URL (URL encoded before sending)
+
+**Example Configuration:**
+```
+API Type: Data API
+Domain: eBay
+eBay API Type: Search API
+Input Type: Query
+Query: laptop
+```
+
+#### eBay Feedback API
+
+The eBay Feedback API makes it easy to grab public feedback profiles from the `/ebay/feedback` endpoint. Provide the target `username` or the direct feedback profile URL (make sure to URL encode it first).
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/feedback?api_key=YOUR_API_KEY&username=example_user"
+```
+
+Or use the feedback profile URL:
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/feedback?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.ebay.com%2Ffdbk%2Ffeedback_profile%2Ftest_username"
+```
+
+**Parameters:**
+- **Input Type:** Username or Feedback URL
+- **Username:** The exact eBay username you want to retrieve feedback for
+- **Feedback URL:** Fully qualified feedback page URL (URL encoded before sending)
+
+**Example Configuration:**
+```
+API Type: Data API
+Domain: eBay
+eBay API Type: Feedback API
+Input Type: Username
+Username: example_user
+```
+
+#### eBay Category API
+
+Use the eBay Category API to capture structured listings from `/ebay/category`. Provide either the numeric `category_id` or the category URL (make sure it’s URL encoded before sending).
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/category?api_key=YOUR_API_KEY&category_id=7000259856"
+```
+
+Or target the page directly:
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/category?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.ebay.com%2Fb%2FLaptops%2F175672%2Fbn_1648276"
+```
+
+**Parameters:**
+- **Input Type:** Category ID or Category URL
+- **Category ID:** The numeric identifier associated with the eBay category you want to scrape
+- **Category URL:** Fully qualified category page URL (URL encoded before sending)
+
+**Example Configuration:**
+```
+API Type: Data API
+Domain: eBay
+eBay API Type: Category API
+Input Type: Category ID
+Category ID: 175672
+```
+
+#### eBay Store API
+
+The eBay Store API fetches structured storefront data from the `/ebay/store` endpoint. Supply either the public-facing `store_name` or the full store URL (remember to URL encode it).
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/store?api_key=YOUR_API_KEY&store_name=mystore"
+```
+
+Or pass the store URL directly:
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/store?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.ebay.com%2Fstr%2Ftest_store"
+```
+
+**Parameters:**
+- **Input Type:** Store Name or Store URL
+- **Store Name:** The storefront slug shown on eBay (e.g., mystore)
+- **Store URL:** Full URL of the store page (URL encoded before sending)
+
+**Example Configuration:**
+```
+API Type: Data API
+Domain: eBay
+eBay API Type: Store API
+Input Type: Store Name
+Store Name: mystore
 ```
 
 ---
