@@ -36,3 +36,8 @@ export interface IAmazonApiOptions {
   country?: string;
   tld?: string;
 }
+
+export interface IWalmartApiOptions {
+  country?: string;
+  tld?: string;
+}

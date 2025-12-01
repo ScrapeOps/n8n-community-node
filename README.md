@@ -32,15 +32,11 @@ The **[ScrapeOps n8n node](https://n8n.io/integrations/scrapeops/)** is a powerf
 - Returns clean, structured JSON data
 
 ### 💾 Data API
-- Direct access to structured data endpoints
-- **[Amazon Product API](https://scrapeops.io/docs/data-api/amazon-product-api/)**: Get product details by ASIN or URL
-- **[Amazon Search API](https://scrapeops.io/docs/data-api/amazon-product-search-api/)**: Search products and get structured results
-- **eBay Product API**: Get product data from eBay listings via Item ID or product URL
-- **eBay Search API**: Query eBay search results via keywords or search URLs
-- **eBay Feedback API**: Retrieve seller or buyer feedback pages by username or URL
-- **eBay Category API**: Scrape product listings from category pages by ID or URL
-- **eBay Store API**: Capture storefront data via store name or store URL
-- No HTML scraping required - get data in a single request
+- Direct access to structured data endpoints for Amazon, eBay, and Walmart
+- **Amazon**: [Product](https://scrapeops.io/docs/data-api/amazon-product-api/), [Search](https://scrapeops.io/docs/data-api/amazon-product-search-api/)
+ 
+- **Walmart**: [Product](https://scrapeops.io/docs/data-api/walmart-product-api/), [Product Search](https://scrapeops.io/docs/data-api/walmart-product-search-api/), [Category](https://scrapeops.io/docs/data-api/walmart-category-api/), [Review](https://scrapeops.io/docs/data-api/walmart-review-api/), [Shop](https://scrapeops.io/docs/data-api/walmart-shop-api/), [Browse](https://scrapeops.io/docs/data-api/walmart-browse-api/)
+- No HTML scraping required - get structured responses in a single request
 
 ---
 
@@ -223,160 +219,188 @@ HTML Content: {{ $node["Proxy_API"].json.body }}
 
 ### 💾 Data API
 
-Access pre-scraped datasets, focused on Amazon.
+Access pre-scraped datasets for Amazon, eBay, and Walmart
 
 **Parameters:**
-- **Domain:** Amazon or eBay
-- **Amazon API Type:** [Product](https://scrapeops.io/docs/data-api/amazon-product-api/) or [Search](https://scrapeops.io/docs/data-api/amazon-product-search-api/)
-- **Input Type:** ASIN/URL for Product; Query/URL for Search
-- **eBay Product Input:** Item ID or Product URL (URL encoded)
-- **eBay API Type:** Product, Search, Feedback, or Category
-- **eBay Search Input:** Query or Search URL (URL encoded)
-- **eBay Feedback Input:** Username or Feedback URL (URL encoded)
-- **eBay Category Input:** Category ID or Category URL (URL encoded)
-- **eBay Store Input:** Store Name or Store URL (URL encoded)
+- **Domain:** Choose `Amazon`, `eBay`, or `Walmart`
+- **API Type:** Select the specific endpoint (e.g., Product, Search, Category, Store/Shop, Feedback/Review/Browse)
+- **Input Type:** Provide the identifier the endpoint expects (ASIN, Item ID, Product ID, Category ID, keyword, URL, etc.)
 
-**Example Configuration:**
-```
-API Type: Data API
-Domain: Amazon
-Amazon API Type: Product API
-Input Type: ASIN
-ASIN: B08N5WRWNW
-```
-
-#### eBay Product API
-
-The eBay Product API lets you pull structured data from any public eBay product page via the `/ebay/product` endpoint. Provide either the `item_id` or a URL to the listing (make sure to URL encode it).
-
-```
-curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/product?api_key=YOUR_API_KEY&item_id=123456789"
-```
-
-**Parameters:**
-- **Input Type:** Item ID or Product URL
-- **Item ID:** The numeric eBay identifier for the listing you want to scrape
-- **Product URL:** The fully qualified product URL (URL encoded before sending)
-
-**Example Configuration:**
+**Example Configuration (eBay Product API):**
 ```
 API Type: Data API
 Domain: eBay
+API Endpoint: eBay Product API
 Input Type: Item ID
-Item ID: 155616449358
+Item ID: 155555555555
 ```
 
-#### eBay Search API
-
-The eBay Search API lets you capture structured search results from the `/ebay/search` endpoint. Provide a keyword query or pass the exact search results URL (remember to URL encode it per URL standards).
-
-```
-curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/search?api_key=YOUR_API_KEY&query=laptop"
-```
-
-Or send the URL directly:
-
-```
-curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/search?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.ebay.com%2Fsch%2Fi.html%3F_nkw%3Dlaptop"
-```
-
-**Parameters:**
-- **Input Type:** Query or Search URL
-- **Query:** The keyword phrase you want eBay to search for
-- **Search URL:** The fully qualified eBay search results URL (URL encoded before sending)
-
-**Example Configuration:**
+**Example Configuration (Walmart Product API):**
 ```
 API Type: Data API
-Domain: eBay
-eBay API Type: Search API
-Input Type: Query
-Query: laptop
+Domain: Walmart
+API Endpoint: Walmart Product API
+Input Type: Product ID
+Product ID: 323456789
 ```
 
-#### eBay Feedback API
+#### Walmart Product API
 
-The eBay Feedback API makes it easy to grab public feedback profiles from the `/ebay/feedback` endpoint. Provide the target `username` or the direct feedback profile URL (make sure to URL encode it first).
+Leverage the dedicated `walmart/product` endpoint to retrieve structured data for any public Walmart product page.
 
-```
-curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/feedback?api_key=YOUR_API_KEY&username=example_user"
-```
-
-Or use the feedback profile URL:
+**Request Examples**
 
 ```
-curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/feedback?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.ebay.com%2Ffdbk%2Ffeedback_profile%2Ftest_username"
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/product?api_key=YOUR_API_KEY&product_id=405234096&country=us"
 ```
 
-**Parameters:**
-- **Input Type:** Username or Feedback URL
-- **Username:** The exact eBay username you want to retrieve feedback for
-- **Feedback URL:** Fully qualified feedback page URL (URL encoded before sending)
-
-**Example Configuration:**
 ```
-API Type: Data API
-Domain: eBay
-eBay API Type: Feedback API
-Input Type: Username
-Username: example_user
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/product?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.walmart.com%2Fip%2F405234096"
 ```
 
-#### eBay Category API
+**Authentication**
 
-Use the eBay Category API to capture structured listings from `/ebay/category`. Provide either the numeric `category_id` or the category URL (make sure it’s URL encoded before sending).
+You must supply your ScrapeOps `api_key` with every request (see the Authentication section above). Requests without a valid key return `403 Forbidden`.
 
-```
-curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/category?api_key=YOUR_API_KEY&category_id=7000259856"
-```
+**Parameters**
 
-Or target the page directly:
+| Parameter   | Description |
+|-------------|-------------|
+| `api_key`   | **Required.** ScrapeOps API key used for authentication. |
+| `product_id`| Walmart Product ID you want to fetch. |
+| `url`       | Encoded Walmart product URL. If present, URL takes precedence over `product_id`. |
+| `country`   | Two-letter country code that controls the locale to scrape from (e.g. `us`, `ca`, `mx`). |
+| `tld`       | Walmart top-level domain such as `com`, `ca`, `com.mx`, `cl`, `com.br`. |
 
-```
-curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/category?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.ebay.com%2Fb%2FLaptops%2F175672%2Fbn_1648276"
-```
+| TLD | Domain |
+|-----|--------|
+| `com` | `walmart.com` |
+| `ca` | `walmart.ca` |
+| `com.mx` | `walmart.com.mx` |
+| `cl` | `walmart.cl` |
+| `com.br` | `walmart.com.br` |
 
-**Parameters:**
-- **Input Type:** Category ID or Category URL
-- **Category ID:** The numeric identifier associated with the eBay category you want to scrape
-- **Category URL:** Fully qualified category page URL (URL encoded before sending)
+#### Walmart Product Search API
 
-**Example Configuration:**
-```
-API Type: Data API
-Domain: eBay
-eBay API Type: Category API
-Input Type: Category ID
-Category ID: 175672
-```
+Search Walmart’s catalog with the `walmart/search` endpoint using either a text query or an existing search results URL.
 
-#### eBay Store API
-
-The eBay Store API fetches structured storefront data from the `/ebay/store` endpoint. Supply either the public-facing `store_name` or the full store URL (remember to URL encode it).
+**Request Examples**
 
 ```
-curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/store?api_key=YOUR_API_KEY&store_name=mystore"
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/search?api_key=YOUR_API_KEY&query=laptop&country=us"
 ```
 
-Or pass the store URL directly:
-
 ```
-curl -GET "https://proxy.scrapeops.io/v1/structured-data/ebay/store?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.ebay.com%2Fstr%2Ftest_store"
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/search?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.walmart.com%2Fsearch%3Fq%3Dlaptop"
 ```
 
-**Parameters:**
-- **Input Type:** Store Name or Store URL
-- **Store Name:** The storefront slug shown on eBay (e.g., mystore)
-- **Store URL:** Full URL of the store page (URL encoded before sending)
+**Parameters**
 
-**Example Configuration:**
+| Parameter | Description |
+|-----------|-------------|
+| `api_key` | **Required.** ScrapeOps API key used for authentication. |
+| `query`   | Search keyword/phrase you want Walmart to return results for. |
+| `url`     | Encoded Walmart search URL. Overrides `query` if supplied. |
+| `country` | Two-letter ISO country code for localized search (e.g. `us`, `ca`, `mx`). |
+| `tld`     | Walmart top-level domain such as `com`, `ca`, `com.mx`, `cl`, `com.br`. |
+
+Use the same TLD mapping table from the Product API section to choose the correct domain.
+
+#### Walmart Review API
+
+Gather structured review data for any Walmart product via the `walmart/review` endpoint.
+
+**Request Examples**
+
 ```
-API Type: Data API
-Domain: eBay
-eBay API Type: Store API
-Input Type: Store Name
-Store Name: mystore
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/review?api_key=YOUR_API_KEY&product_id=1833409885&country=us"
 ```
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/review?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.walmart.com%2Fip%2F1833409885"
+```
+
+**Parameters**
+
+| Parameter   | Description |
+|-------------|-------------|
+| `api_key`   | **Required.** ScrapeOps API key used for authentication. |
+| `product_id`| Walmart Product ID whose reviews you want to retrieve. |
+| `url`       | Encoded Walmart review page URL. Overrides `product_id` when provided. |
+| `country`   | Two-letter ISO country code controlling localization. |
+| `tld`       | Walmart top-level domain such as `com`, `ca`, `com.mx`, `cl`, `com.br`. |
+
+#### Walmart Shop API
+
+Fetch data for Walmart brand and seller pages using the `walmart/shop` endpoint.
+
+**Request Examples**
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/shop?api_key=YOUR_API_KEY&shop_id=12345&country=us"
+```
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/shop?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.walmart.com%2Fbrand%2F10027886"
+```
+
+**Parameters**
+
+| Parameter | Description |
+|-----------|-------------|
+| `api_key` | **Required.** ScrapeOps API key used for authentication. |
+| `shop_id` | Walmart Shop ID (brand or seller identifier). |
+| `url`     | Encoded Walmart shop page URL. Overrides `shop_id` when supplied. |
+| `country` | Two-letter ISO country code controlling localization. |
+| `tld`     | Walmart top-level domain such as `com`, `ca`, `com.mx`, `cl`, `com.br`. |
+
+#### Walmart Browse API
+
+Get structured category/browse listings using the `walmart/browse` endpoint. Supply either the browse path hierarchy or a URL.
+
+**Request Examples**
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/browse?api_key=YOUR_API_KEY&browse_path=3944_1060825_447913&country=us"
+```
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/browse?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.walmart.com%2Fbrowse%2Felectronics%2F3944_1060825_447913"
+```
+
+**Parameters**
+
+| Parameter     | Description |
+|---------------|-------------|
+| `api_key`     | **Required.** ScrapeOps API key used for authentication. |
+| `browse_path` | Walmart browse hierarchy (e.g. `3944_1060825_447913`). |
+| `url`         | Encoded Walmart browse URL. Overrides `browse_path` when provided. |
+| `country`     | Two-letter ISO country code controlling localization. |
+| `tld`         | Walmart top-level domain such as `com`, `ca`, `com.mx`, `cl`, `com.br`. |
+
+#### Walmart Category API
+
+Query Walmart category pages via the `walmart/category` endpoint using a numeric category ID or a full URL.
+
+**Request Examples**
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/category?api_key=YOUR_API_KEY&category_id=1007039&country=us"
+```
+
+```
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/category?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.walmart.com%2Fcp%2Felectronics%2F1007039"
+```
+
+**Parameters**
+
+| Parameter     | Description |
+|---------------|-------------|
+| `api_key`     | **Required.** ScrapeOps API key used for authentication. |
+| `category_id` | Walmart Category ID you want to fetch. |
+| `url`         | Encoded Walmart category URL. Overrides `category_id` when present. |
+| `country`     | Two-letter ISO country code controlling localization. |
+| `tld`         | Walmart top-level domain such as `com`, `ca`, `com.mx`, `cl`, `com.br`. |
 
 ---
 
@@ -447,6 +471,50 @@ Session Number: 12345
 1. Ensure n8n was restarted after installation
 2. Check that community nodes are enabled
 3. Verify the installation with: `npm list @scrapeops/n8n-nodes-scrapeops`
+
+### Local Development Setup
+
+1. **Install n8n globally**
+   ```bash
+   npm install n8n -g
+   ```
+
+2. **Navigate to your n8n data directory**
+   ```bash
+   cd ~/.n8n
+   ```
+
+3. **Create and enter a custom folder**
+   ```bash
+   mkdir -p custom
+   cd custom
+   ```
+
+4. **Initialize the workspace**
+   ```bash
+   npm init -y
+   ```
+
+5. **Build & pack the node (run inside the `n8n-community-node` repo)**
+   ```bash
+   # Install dependencies (use npm install for local dev or npm ci for clean installs)
+   npm install
+   # npm ci
+
+   # Build and create the tarball
+   npm run build
+   PKG=$(npm pack | tail -n1)
+   ```
+
+6. **Install the packed artifact into your custom folder that we created under .n8n**
+   ```bash
+   npm install --no-save "<PATH_TO_YOUR_REPO>/$PKG"
+   ```
+
+7. **Start n8n**
+  ```bash
+  n8n
+  ```   
 
 ### Authentication Failures
 **Problem:** "Invalid API Key" error
