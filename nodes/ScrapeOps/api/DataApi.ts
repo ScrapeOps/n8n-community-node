@@ -21,6 +21,7 @@ export class DataApi {
         },
         options: [
           { name: 'Amazon', value: 'amazon' },
+          { name: 'eBay', value: 'ebay' },
           { name: 'Walmart', value: 'walmart' },
         ],
         default: 'amazon',
@@ -218,17 +219,51 @@ export class DataApi {
         ],
       },
       {
+        displayName: 'eBay API Type',
+        name: 'ebayApiType',
         displayName: 'Walmart API Type',
         name: 'walmartApiType',
         type: 'options',
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
             dataDomain: ['walmart'],
           },
         },
         options: [
           {
+            name: 'Product API',
+            value: 'product',
+            description: 'Retrieve structured data for a specific eBay listing',
+          },
+          {
+            name: 'Search API',
+            value: 'search',
+            description: 'Retrieve structured search results for an eBay keyword or URL',
+          },
+          {
+            name: 'Feedback API',
+            value: 'feedback',
+            description: 'Retrieve seller or buyer feedback data from eBay profiles',
+          },
+          {
+            name: 'Category API',
+            value: 'category',
+            description: 'Retrieve structured product listings from eBay category pages',
+          },
+          {
+            name: 'Store API',
+            value: 'store',
+            description: 'Retrieve structured data from eBay storefronts by name or URL',
+          },
+        ],
+        default: 'product',
+        description: 'Type of eBay API to use',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebayProductInputType',
             name: 'Browse API',
             value: 'browse',
             description: 'Retrieve data for a Walmart browse page by Browse Path or URL',
@@ -269,12 +304,30 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['product'],
             dataDomain: ['walmart'],
             walmartApiType: ['product'],
           },
         },
         options: [
           {
+            name: 'Item ID',
+            value: 'itemId',
+            description: 'Unique eBay item ID (e.g. 155616449358)',
+          },
+          {
+            name: 'Product URL',
+            value: 'url',
+            description: 'Full eBay product URL (encoded if necessary)',
+          },
+        ],
+        default: 'itemId',
+        description: 'Type of input for the eBay Product API request',
+      },
+      {
+        displayName: 'Item ID',
+        name: 'ebayProductItemId',
             name: 'Product ID',
             value: 'productId',
             description: 'Walmart Product ID',
@@ -295,6 +348,9 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['product'],
+            ebayProductInputType: ['itemId'],
             dataDomain: ['walmart'],
             walmartApiType: ['product'],
             walmartProductInputType: ['productId'],
@@ -302,6 +358,11 @@ export class DataApi {
         },
         default: '',
         required: true,
+        description: 'eBay item ID for the product you want to retrieve',
+      },
+      {
+        displayName: 'Product URL',
+        name: 'ebayProductUrl',
         description: 'Walmart Product ID of the product to retrieve',
       },
       {
@@ -311,6 +372,9 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['product'],
+            ebayProductInputType: ['url'],
             dataDomain: ['walmart'],
             walmartApiType: ['product'],
             walmartProductInputType: ['url'],
@@ -318,6 +382,11 @@ export class DataApi {
         },
         default: '',
         required: true,
+        description: 'Full eBay product URL (remember to URL encode before sending)',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebaySearchInputType',
         description: 'Full URL of the Walmart product page',
       },
       {
@@ -327,12 +396,30 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['search'],
             dataDomain: ['walmart'],
             walmartApiType: ['review'],
           },
         },
         options: [
           {
+            name: 'Query',
+            value: 'query',
+            description: 'Keyword or phrase to search for on eBay',
+          },
+          {
+            name: 'Search URL',
+            value: 'url',
+            description: 'Full eBay search results URL (URL encode before sending)',
+          },
+        ],
+        default: 'query',
+        description: 'Type of input for the eBay Search API request',
+      },
+      {
+        displayName: 'Search Query',
+        name: 'ebaySearchQuery',
             name: 'Product ID',
             value: 'productId',
             description: 'Walmart Product ID associated with the review page',
@@ -353,6 +440,9 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['search'],
+            ebaySearchInputType: ['query'],
             dataDomain: ['walmart'],
             walmartApiType: ['review'],
             walmartReviewInputType: ['productId'],
@@ -360,6 +450,11 @@ export class DataApi {
         },
         default: '',
         required: true,
+        description: 'Keyword or phrase to search for on eBay (e.g., laptop, sneakers)',
+      },
+      {
+        displayName: 'Search URL',
+        name: 'ebaySearchUrl',
         description: 'Walmart Product ID of the item whose reviews should be retrieved',
       },
       {
@@ -369,6 +464,9 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['search'],
+            ebaySearchInputType: ['url'],
             dataDomain: ['walmart'],
             walmartApiType: ['review'],
             walmartReviewInputType: ['url'],
@@ -376,6 +474,11 @@ export class DataApi {
         },
         default: '',
         required: true,
+        description: 'Full eBay search page URL (remember to URL encode before sending)',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebayFeedbackInputType',
         description: 'Full URL of the Walmart review page',
       },
       {
@@ -385,12 +488,30 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['feedback'],
             dataDomain: ['walmart'],
             walmartApiType: ['shop'],
           },
         },
         options: [
           {
+            name: 'Username',
+            value: 'username',
+            description: 'eBay username whose feedback page should be scraped',
+          },
+          {
+            name: 'Feedback URL',
+            value: 'url',
+            description: 'Full eBay feedback page URL (URL encode before sending)',
+          },
+        ],
+        default: 'username',
+        description: 'Type of input for the eBay Feedback API request',
+      },
+      {
+        displayName: 'Username',
+        name: 'ebayFeedbackUsername',
             name: 'Shop ID',
             value: 'shopId',
             description: 'Walmart Shop ID',
@@ -411,6 +532,9 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['feedback'],
+            ebayFeedbackInputType: ['username'],
             dataDomain: ['walmart'],
             walmartApiType: ['shop'],
             walmartShopInputType: ['shopId'],
@@ -418,6 +542,11 @@ export class DataApi {
         },
         default: '',
         required: true,
+        description: 'Exact eBay username to retrieve feedback for',
+      },
+      {
+        displayName: 'Feedback URL',
+        name: 'ebayFeedbackUrl',
         description: 'Walmart Shop ID to retrieve',
       },
       {
@@ -427,6 +556,9 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['feedback'],
+            ebayFeedbackInputType: ['url'],
             dataDomain: ['walmart'],
             walmartApiType: ['shop'],
             walmartShopInputType: ['url'],
@@ -434,6 +566,11 @@ export class DataApi {
         },
         default: '',
         required: true,
+        description: 'Full eBay feedback page URL (remember to URL encode before sending)',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebayCategoryInputType',
         description: 'Full URL of the Walmart shop page',
       },
       {
@@ -443,6 +580,8 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['category'],
             dataDomain: ['walmart'],
             walmartApiType: ['browse'],
           },
@@ -509,6 +648,20 @@ export class DataApi {
           {
             name: 'Category ID',
             value: 'categoryId',
+            description: 'eBay numeric category ID (e.g. 1648276), The Id after bn_ in the URL (https://www.ebay.com/b/Laptops/bn_1648276) is 1648276',
+          },
+          {
+            name: 'Category URL',
+            value: 'url',
+            description: 'Full eBay category page URL (URL encode before sending)',
+          },
+        ],
+        default: 'categoryId',
+        description: 'Type of input for the eBay Category API request',
+      },
+      {
+        displayName: 'Category ID',
+        name: 'ebayCategoryId',
             description: 'Walmart Category ID',
           },
           {
@@ -527,6 +680,9 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['category'],
+            ebayCategoryInputType: ['categoryId'],
             dataDomain: ['walmart'],
             walmartApiType: ['category'],
             walmartCategoryInputType: ['categoryId'],
@@ -534,6 +690,11 @@ export class DataApi {
         },
         default: '',
         required: true,
+        description: 'The eBay category identifier you want to scrape',
+      },
+      {
+        displayName: 'Category URL',
+        name: 'ebayCategoryUrl',
         description: 'Walmart Category ID to retrieve',
       },
       {
@@ -543,6 +704,9 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['category'],
+            ebayCategoryInputType: ['url'],
             dataDomain: ['walmart'],
             walmartApiType: ['category'],
             walmartCategoryInputType: ['url'],
@@ -550,6 +714,11 @@ export class DataApi {
         },
         default: '',
         required: true,
+        description: 'Full eBay category page URL (remember to URL encode before sending)',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebayStoreInputType',
         description: 'Full URL of the Walmart category page',
       },
       {
@@ -596,12 +765,30 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['store'],
             dataDomain: ['walmart'],
             walmartApiType: ['search'],
           },
         },
         options: [
           {
+            name: 'Store Name',
+            value: 'storeName',
+            description: 'Public-facing eBay store name (e.g. mystore)',
+          },
+          {
+            name: 'Store URL',
+            value: 'url',
+            description: 'Full eBay store URL (URL encode before sending)',
+          },
+        ],
+        default: 'storeName',
+        description: 'Type of input for the eBay Store API request',
+      },
+      {
+        displayName: 'Store Name',
+        name: 'ebayStoreName',
             name: 'Query',
             value: 'query',
             description: 'Search query for Walmart products',
@@ -622,6 +809,9 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['store'],
+            ebayStoreInputType: ['storeName'],
             dataDomain: ['walmart'],
             walmartApiType: ['search'],
             walmartSearchInputType: ['query'],
@@ -629,6 +819,11 @@ export class DataApi {
         },
         default: '',
         required: true,
+        description: 'Exact eBay storefront name you want to retrieve data for',
+      },
+      {
+        displayName: 'Store URL',
+        name: 'ebayStoreUrl',
         description: 'Search query for Walmart products',
       },
       {
@@ -638,6 +833,9 @@ export class DataApi {
         displayOptions: {
           show: {
             apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['store'],
+            ebayStoreInputType: ['url'],
             dataDomain: ['walmart'],
             walmartApiType: ['search'],
             walmartSearchInputType: ['url'],
@@ -645,6 +843,7 @@ export class DataApi {
         },
         default: '',
         required: true,
+        description: 'Full eBay store page URL (remember to URL encode before sending)',
         description: 'Full Walmart search URL',
       },
     ];
@@ -662,6 +861,15 @@ export class DataApi {
     if (dataDomain === 'amazon') {
       const amazonApiType = this.getNodeParameter('amazonApiType', index) as string;
       const amazonApiOptions = this.getNodeParameter('amazonApiOptions', index, {}) as IAmazonApiOptions;
+
+      if (amazonApiOptions.country) qsParams.country = amazonApiOptions.country;
+      if (amazonApiOptions.tld) qsParams.tld = amazonApiOptions.tld;
+
+      if (amazonApiType === 'product') {
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/amazon/product';
+
+        const inputType = this.getNodeParameter('amazonProductInputType', index) as string;
+
 
       if (amazonApiOptions.country) qsParams.country = amazonApiOptions.country;
       if (amazonApiOptions.tld) qsParams.tld = amazonApiOptions.tld;
@@ -690,6 +898,68 @@ export class DataApi {
           const url = this.getNodeParameter('amazonSearchUrl', index) as string;
           qsParams.url = url;
         }
+      }
+    } else if (dataDomain === 'ebay') {
+      const ebayApiType = this.getNodeParameter('ebayApiType', index) as string;
+
+      if (ebayApiType === 'product') {
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/ebay/product';
+
+        const inputType = this.getNodeParameter('ebayProductInputType', index) as string;
+
+        if (inputType === 'itemId') {
+          const itemId = this.getNodeParameter('ebayProductItemId', index) as string;
+          qsParams.item_id = itemId;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebayProductUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (ebayApiType === 'search') {
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/ebay/search';
+
+        const inputType = this.getNodeParameter('ebaySearchInputType', index) as string;
+
+        if (inputType === 'query') {
+          const query = this.getNodeParameter('ebaySearchQuery', index) as string;
+          qsParams.query = query;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebaySearchUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (ebayApiType === 'feedback') {
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/ebay/feedback';
+
+        const inputType = this.getNodeParameter('ebayFeedbackInputType', index) as string;
+
+        if (inputType === 'username') {
+          const username = this.getNodeParameter('ebayFeedbackUsername', index) as string;
+          qsParams.username = username;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebayFeedbackUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (ebayApiType === 'category') {
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/ebay/category';
+
+        const inputType = this.getNodeParameter('ebayCategoryInputType', index) as string;
+
+      if (inputType === 'categoryId') {  
+          const categoryId = this.getNodeParameter('ebayCategoryId', index) as string;
+          qsParams.category_id = categoryId;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebayCategoryUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (ebayApiType === 'store') {
+        baseUrl = 'https://proxy.scrapeops.io/v1/structured-data/ebay/store';
+
+        const inputType = this.getNodeParameter('ebayStoreInputType', index) as string;
+
+        if (inputType === 'storeName') {
+          const storeName = this.getNodeParameter('ebayStoreName', index) as string;
+          qsParams.store_name = storeName;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebayStoreUrl', index) as string;
       } else {
         throw new NodeOperationError(
           this.getNode(),
@@ -779,22 +1049,14 @@ export class DataApi {
       } else {
         throw new NodeOperationError(
           this.getNode(),
-          `Unsupported Walmart API type: ${walmartApiType}. Please select a valid API type.`,
+          `Unsupported eBay API type: ${ebayApiType}. Please select product, search, feedback, category, or store.`,
           { itemIndex: index },
         );
       }
     } else {
       throw new NodeOperationError(
         this.getNode(),
-        `Unsupported data domain: ${dataDomain}. Please select a valid domain.`,
-        { itemIndex: index },
-      );
-    }
-
-    if (!baseUrl) {
-      throw new NodeOperationError(
-        this.getNode(),
-        'Unable to determine the Data API endpoint. Please review your parameters.',
+        `Unsupported data domain: ${dataDomain}. Please select a supported domain.`,
         { itemIndex: index },
       );
     }
