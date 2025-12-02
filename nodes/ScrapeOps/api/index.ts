@@ -1,7 +1,7 @@
 import { ProxyApi } from './ProxyApi';
 import { ParserApi } from './ParserApi';
 import { DataApi } from './DataApi';
-import { IScrapeOpsApiOptions, IProxyAdvancedOptions, IAmazonApiOptions } from './types';
+import { IScrapeOpsApiOptions, IProxyAdvancedOptions, IAmazonApiOptions, IWalmartApiOptions } from './types';
 
 export {
   ProxyApi,
@@ -10,4 +10,5 @@ export {
   IScrapeOpsApiOptions,
   IProxyAdvancedOptions,
   IAmazonApiOptions,
+  IWalmartApiOptions,
 };
