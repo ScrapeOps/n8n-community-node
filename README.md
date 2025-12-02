@@ -32,11 +32,10 @@ The **[ScrapeOps n8n node](https://n8n.io/integrations/scrapeops/)** is a powerf
 - Returns clean, structured JSON data
 
 ### 💾 Data API
-- Direct access to structured data endpoints for Amazon, eBay, and Walmart
-- **Amazon**: [Product](https://scrapeops.io/docs/data-api/amazon-product-api/), [Search](https://scrapeops.io/docs/data-api/amazon-product-search-api/)
- 
-- **Walmart**: [Product](https://scrapeops.io/docs/data-api/walmart-product-api/), [Product Search](https://scrapeops.io/docs/data-api/walmart-product-search-api/), [Category](https://scrapeops.io/docs/data-api/walmart-category-api/), [Review](https://scrapeops.io/docs/data-api/walmart-review-api/), [Shop](https://scrapeops.io/docs/data-api/walmart-shop-api/), [Browse](https://scrapeops.io/docs/data-api/walmart-browse-api/)
-- No HTML scraping required - get structured responses in a single request
+- Direct access to structured data endpoints
+- **[Amazon Product API](https://scrapeops.io/docs/data-api/amazon-product-api/)**: Get product details by ASIN or URL
+- **[Amazon Search API](https://scrapeops.io/docs/data-api/amazon-product-search-api/)**: Search products and get structured results
+- No HTML scraping required - get data in a single request
 
 ---
 
@@ -204,7 +203,6 @@ Parse HTML into structured JSON for supported domains.
 
 **Parameters:**
 - **Domain:** [Amazon](https://scrapeops.io/docs/parser-api/parsers/amazon-product-parser/), [eBay](https://scrapeops.io/docs/parser-api/parsers/ebay-product-parser/), [Walmart](https://scrapeops.io/docs/parser-api/parsers/walmart-product-parser/), [Indeed](https://scrapeops.io/docs/parser-api/parsers/indeed-product-parser/), [Redfin](https://scrapeops.io/docs/parser-api/parsers/redfin-product-parser/)
-- **Page Type:** Varies by domain (e.g., Product, Search for Amazon)
 - **URL:** Page URL (required)
 - **HTML Content:** Raw HTML to parse (required)
 
@@ -212,39 +210,109 @@ Parse HTML into structured JSON for supported domains.
 ```
 API Type: Parser API
 Domain: Amazon
-Page Type: Product Page
 URL: https://www.amazon.com/dp/B08N5WRWNW
 HTML Content: {{ $node["Proxy_API"].json.body }}
 ```
 
 ### 💾 Data API
 
-Access pre-scraped datasets for Amazon, eBay, and Walmart
+Tap into pre-scraped datasets for commerce, jobs, and real estate without maintaining your own crawlers or parsers.
 
-**Parameters:**
-- **Domain:** Choose `Amazon`, `eBay`, or `Walmart`
-- **API Type:** Select the specific endpoint (e.g., Product, Search, Category, Store/Shop, Feedback/Review/Browse)
-- **Input Type:** Provide the identifier the endpoint expects (ASIN, Item ID, Product ID, Category ID, keyword, URL, etc.)
+**Workflow basics**
 
-**Example Configuration (eBay Product API):**
+- **Domain**: Choose `Amazon`, `eBay`, `Walmart`, `Indeed`, or `Redfin`.
+- **API Type**: Select the dataset endpoint that matches the data you need (product, search, reviews, etc.).
+- **Input Type**: Decide whether you want to identify the record via ID, query, or URL.
+- **Advanced Options**: Provide localization parameters (`country`, `tld`) when available to scope the dataset to a specific market.
+- All Data API calls are `GET` requests to `https://proxy.scrapeops.io/v1/structured-data/<domain>/<endpoint>` authenticated with your ScrapeOps API key.
+
+**Quick n8n example**
+
 ```
 API Type: Data API
-Domain: eBay
-API Endpoint: eBay Product API
-Input Type: Item ID
-Item ID: 155555555555
+Domain: Amazon
+API Endpoint: Product API
+Input Type: ASIN
+ASIN: B08N5WRWNW
+Advanced Options: Country = us, TLD = com
 ```
 
-**Example Configuration (Walmart Product API):**
 ```
-API Type: Data API
-Domain: Walmart
-API Endpoint: Walmart Product API
-Input Type: Product ID
-Product ID: 323456789
+curl -G "https://proxy.scrapeops.io/v1/structured-data/amazon/product" \
+  --data-urlencode "api_key=YOUR_API_KEY" \
+  --data-urlencode "asin=B08N5WRWNW" \
+  --data-urlencode "country=us" \
+  --data-urlencode "tld=com"
 ```
 
-#### Walmart Product API
+#### Amazon Data API
+
+Get normalized product details or search result summaries for any Amazon locale.
+
+**Endpoints**
+
+| Endpoint | Path | Input Types | Description |
+|----------|------|-------------|-------------|
+| Product API | `/structured-data/amazon/product` | `asin`, `url` | Returns product attributes, pricing, inventory, variations, media, and buy box metadata. |
+| Product Search API | `/structured-data/amazon/search` | `query`, `url` | Returns paginated search results including summary cards, pricing, badges, and sponsored flags. |
+
+**Advanced options**
+
+| Option | Details |
+|--------|---------|
+| `country` | Two-letter locale that controls the market being scraped (e.g. `us`, `uk`, `ca`, `de`, `fr`, `it`, `es`, `nl`, `pl`, `in`, `jp`, `au`, `mx`, `br`, `sa`, `ae`). |
+| `tld` | Amazon domain to target: `com`, `co.uk`, `de`, `fr`, `es`, `it`, `nl`, `pl`, `com.au`, `com.br`, `com.mx`, `co.jp`, `ae`, `sa`, `ca`, `in`, `com.tr`. |
+
+**Sample request**
+
+```
+curl -G "https://proxy.scrapeops.io/v1/structured-data/amazon/search" \
+  --data-urlencode "api_key=YOUR_API_KEY" \
+  --data-urlencode "query=wireless earbuds" \
+  --data-urlencode "country=us" \
+  --data-urlencode "tld=com"
+```
+
+#### eBay Data API
+
+Retrieve listing, search, feedback, and storefront data from eBay without touching the site.
+
+**Endpoints**
+
+| Endpoint | Path | Input Types | Description |
+|----------|------|-------------|-------------|
+| Product API | `/structured-data/ebay/product` | `item_id`, `url` | Detailed listing data including price history, seller stats, and media. |
+| Search API | `/structured-data/ebay/search` | `query`, `url` | Aggregated search results with pagination and sorting metadata. |
+| Feedback API | `/structured-data/ebay/feedback` | `username`, `url` | Seller/buyer feedback profiles and the underlying entries. |
+| Category API | `/structured-data/ebay/category` | `category_id`, `url` | Structured product grids for any eBay category page. |
+| Store API | `/structured-data/ebay/store` | `store_name`, `url` | Highlights and featured products for public storefronts. |
+
+Inputs that contain URLs should be URL encoded before sending (n8n handles this automatically when you paste a URL into the field).
+
+**Sample request**
+
+```
+curl -G "https://proxy.scrapeops.io/v1/structured-data/ebay/product" \
+  --data-urlencode "api_key=YOUR_API_KEY" \
+  --data-urlencode "item_id=155555555555"
+```
+
+#### Walmart Data API
+
+Access Walmart structured datasets for products, search results, reviews, shops, browse paths, and categories. All endpoints support optional `country` and `tld` parameters to localize the response (`country` examples: `us`, `ca`, `mx`; `tld` options: `com`, `ca`, `com.mx`, `cl`, `com.br`).
+
+**Endpoints**
+
+| Endpoint | Path | Input Types |
+|----------|------|-------------|
+| Product API | `/structured-data/walmart/product` | `product_id`, `url` |
+| Product Search API | `/structured-data/walmart/search` | `query`, `url` |
+| Review API | `/structured-data/walmart/reviews` | `product_id`, `url` |
+| Shop API | `/structured-data/walmart/shop` | `shop_id`, `url` |
+| Browse API | `/structured-data/walmart/browse` | `browse_path`, `url` |
+| Category API | `/structured-data/walmart/category` | `category_id`, `url` |
+
+##### Walmart Product API
 
 Leverage the dedicated `walmart/product` endpoint to retrieve structured data for any public Walmart product page.
 
@@ -280,7 +348,7 @@ You must supply your ScrapeOps `api_key` with every request (see the Authenticat
 | `cl` | `walmart.cl` |
 | `com.br` | `walmart.com.br` |
 
-#### Walmart Product Search API
+##### Walmart Product Search API
 
 Search Walmart’s catalog with the `walmart/search` endpoint using either a text query or an existing search results URL.
 
@@ -306,18 +374,18 @@ curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/search?api_key=
 
 Use the same TLD mapping table from the Product API section to choose the correct domain.
 
-#### Walmart Review API
+##### Walmart Review API
 
-Gather structured review data for any Walmart product via the `walmart/review` endpoint.
+Gather structured review data for any Walmart product via the `walmart/reviews` endpoint.
 
 **Request Examples**
 
 ```
-curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/review?api_key=YOUR_API_KEY&product_id=1833409885&country=us"
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/reviews?api_key=YOUR_API_KEY&product_id=1833409885&country=us"
 ```
 
 ```
-curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/review?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.walmart.com%2Fip%2F1833409885"
+curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/reviews?api_key=YOUR_API_KEY&url=https%3A%2F%2Fwww.walmart.com%2Fip%2F1833409885"
 ```
 
 **Parameters**
@@ -330,7 +398,7 @@ curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/review?api_key=
 | `country`   | Two-letter ISO country code controlling localization. |
 | `tld`       | Walmart top-level domain such as `com`, `ca`, `com.mx`, `cl`, `com.br`. |
 
-#### Walmart Shop API
+##### Walmart Shop API
 
 Fetch data for Walmart brand and seller pages using the `walmart/shop` endpoint.
 
@@ -354,7 +422,7 @@ curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/shop?api_key=YO
 | `country` | Two-letter ISO country code controlling localization. |
 | `tld`     | Walmart top-level domain such as `com`, `ca`, `com.mx`, `cl`, `com.br`. |
 
-#### Walmart Browse API
+##### Walmart Browse API
 
 Get structured category/browse listings using the `walmart/browse` endpoint. Supply either the browse path hierarchy or a URL.
 
@@ -378,7 +446,7 @@ curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/browse?api_key=
 | `country`     | Two-letter ISO country code controlling localization. |
 | `tld`         | Walmart top-level domain such as `com`, `ca`, `com.mx`, `cl`, `com.br`. |
 
-#### Walmart Category API
+##### Walmart Category API
 
 Query Walmart category pages via the `walmart/category` endpoint using a numeric category ID or a full URL.
 
@@ -401,6 +469,72 @@ curl -GET "https://proxy.scrapeops.io/v1/structured-data/walmart/category?api_ke
 | `url`         | Encoded Walmart category URL. Overrides `category_id` when present. |
 | `country`     | Two-letter ISO country code controlling localization. |
 | `tld`         | Walmart top-level domain such as `com`, `ca`, `com.mx`, `cl`, `com.br`. |
+
+#### Indeed Data API
+
+Automate research across Indeed job listings and company profiles.
+
+**Endpoints**
+
+| Endpoint | Path | Input Types | Description |
+|----------|------|-------------|-------------|
+| Job Search | `/structured-data/indeed/job-search` | `query`, `url` | Returns search result listings plus pagination metadata. |
+| Job Detail | `/structured-data/indeed/job-detail` | `job_id`, `url` | Returns a structured snapshot of an individual job posting. |
+| Company Search | `/structured-data/indeed/company-search` | `query`, `url` | Search for companies by keyword or copy/paste a company search URL. |
+| Top Companies | `/structured-data/indeed/top-companies` | `industry`, `url` | Returns Indeed's curated top-companies listings filtered by industry or URL. |
+| Company Snapshot | `/structured-data/indeed/company-snapshot` | `company_id`, `url` | Retrieves the high-level snapshot tile for a company. |
+| Company About | `/structured-data/indeed/company-about` | `company_id`, `url` | Returns the long-form company about data. |
+| Company Reviews | `/structured-data/indeed/company-reviews` | `company_id`, `url` | Fetches review aggregates plus the underlying review entries. |
+| Company Jobs | `/structured-data/indeed/company-jobs` | `company_id`, `url` | Lists the currently advertised jobs for a company profile. |
+
+All Indeed endpoints honor optional `country` and `tld` advanced options so that you can mirror regional subdomains (e.g. `co.uk`, `ca`, `fr`, `in`). The `Top Companies` endpoint accepts either a free-text industry filter or a direct URL copied from Indeed.
+
+**Sample requests**
+
+```
+curl -G "https://proxy.scrapeops.io/v1/structured-data/indeed/job-search" \
+  --data-urlencode "api_key=YOUR_API_KEY" \
+  --data-urlencode "query=frontend engineer" \
+  --data-urlencode "country=us" \
+  --data-urlencode "tld=com"
+```
+
+```
+curl -G "https://proxy.scrapeops.io/v1/structured-data/indeed/job-detail" \
+  --data-urlencode "api_key=YOUR_API_KEY" \
+  --data-urlencode "job_id=1234567890" \
+  --data-urlencode "country=us"
+```
+
+#### Redfin Data API
+
+Pull structured residential real estate data from Redfin for both sale and rental markets.
+
+**Endpoints**
+
+| Endpoint | Path | Input Types | Description |
+|----------|------|-------------|-------------|
+| Sale Search | `/structured-data/redfin/sale-search` | `parameters` (city_id, state, city) or `url` | Returns listings for homes for sale in a city. |
+| Rent Search | `/structured-data/redfin/rent-search` | `parameters` (city_id, state, city) or `url` | Returns rental listings for a city or metro. |
+| Sale Detail | `/structured-data/redfin/sale-detail` | `parameters` (state, path, home_id) or `url` | Fetches the detail page for a specific for-sale property. |
+| Rent Detail | `/structured-data/redfin/rent-detail` | `parameters` (state, path, property_id) or `url` | Fetches the detail page for a rental. |
+| Building Detail | `/structured-data/redfin/building-detail` | `parameters` (state, city, building, building_type, building_id) or `url` | Returns amenity and unit data for multi-unit buildings. |
+| State Search | `/structured-data/redfin/state-search` | `state`, `url` | Returns market-level data for a Redfin state page. |
+| Agent Search | `/structured-data/redfin/agent-search` | `parameters` (city_id, state, city) or `url` | Lists Redfin agents for a given geography. |
+| Agent Profile | `/structured-data/redfin/agent-profile` | `agent`, `url` | Fetches a single agent profile. |
+
+Optional Redfin advanced options mirror the `country` and `tld` fields in the node (currently `us`/`ca` and `com`/`ca`). When using the `parameters` input type, make sure to provide all required fields surfaced in the node UI (e.g., City ID + State Code + City Name for city-based searches).
+
+**Sample request**
+
+```
+curl -G "https://proxy.scrapeops.io/v1/structured-data/redfin/sale-search" \
+  --data-urlencode "api_key=YOUR_API_KEY" \
+  --data-urlencode "city_id=30749" \
+  --data-urlencode "state=NY" \
+  --data-urlencode "city=New York" \
+  --data-urlencode "country=us"
+```
 
 ---
 
@@ -471,50 +605,6 @@ Session Number: 12345
 1. Ensure n8n was restarted after installation
 2. Check that community nodes are enabled
 3. Verify the installation with: `npm list @scrapeops/n8n-nodes-scrapeops`
-
-### Local Development Setup
-
-1. **Install n8n globally**
-   ```bash
-   npm install n8n -g
-   ```
-
-2. **Navigate to your n8n data directory**
-   ```bash
-   cd ~/.n8n
-   ```
-
-3. **Create and enter a custom folder**
-   ```bash
-   mkdir -p custom
-   cd custom
-   ```
-
-4. **Initialize the workspace**
-   ```bash
-   npm init -y
-   ```
-
-5. **Build & pack the node (run inside the `n8n-community-node` repo)**
-   ```bash
-   # Install dependencies (use npm install for local dev or npm ci for clean installs)
-   npm install
-   # npm ci
-
-   # Build and create the tarball
-   npm run build
-   PKG=$(npm pack | tail -n1)
-   ```
-
-6. **Install the packed artifact into your custom folder that we created under .n8n**
-   ```bash
-   npm install --no-save "<PATH_TO_YOUR_REPO>/$PKG"
-   ```
-
-7. **Start n8n**
-  ```bash
-  n8n
-  ```   
 
 ### Authentication Failures
 **Problem:** "Invalid API Key" error
