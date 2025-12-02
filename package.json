@@ -1,6 +1,6 @@
 {
   "name": "@scrapeops/n8n-nodes-scrapeops",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "n8n community node for ScrapeOps Proxy, Parser, and Data APIs for web scraping and data extraction",
   "keywords": [
     "n8n-community-node-package",
