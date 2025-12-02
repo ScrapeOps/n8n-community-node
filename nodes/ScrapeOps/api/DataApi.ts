@@ -5,7 +5,13 @@ import {
   IRequestOptions,
   INodeProperties,
 } from 'n8n-workflow';
-import { IAmazonApiOptions, IIndeedApiOptions, IRedfinApiOptions, IScrapeOpsApiOptions } from './types';
+import {
+  IAmazonApiOptions,
+  IWalmartApiOptions,
+  IIndeedApiOptions,
+  IRedfinApiOptions,
+  IScrapeOpsApiOptions,
+} from './types';
 
 const API_BASE_URL = 'https://proxy.scrapeops.io/v1';
 
@@ -23,12 +29,18 @@ export class DataApi {
         },
         options: [
           { name: 'Amazon', value: 'amazon' },
+          { name: 'eBay', value: 'ebay' },
+          { name: 'Walmart', value: 'walmart' },
           { name: 'Indeed', value: 'indeed' },
           { name: 'Redfin', value: 'redfin' },
         ],
         default: 'amazon',
         description: 'Domain data to retrieve',
       },
+
+      //
+      // Amazon configuration
+      //
       {
         displayName: 'Amazon API Type',
         name: 'amazonApiType',
@@ -77,7 +89,7 @@ export class DataApi {
             description: 'Full Amazon product URL',
           },
         ],
-        default: 'asin',
+        default: 'url',
         description: 'Type of input for Amazon Product API',
       },
       {
@@ -135,7 +147,7 @@ export class DataApi {
             description: 'Full Amazon search URL',
           },
         ],
-        default: 'query',
+        default: 'url',
         description: 'Type of input for Amazon Product Search API',
       },
       {
@@ -174,6 +186,7 @@ export class DataApi {
         displayName: 'Advanced Options',
         name: 'amazonApiOptions',
         type: 'collection',
+        placeholder: 'Add Option',
         displayOptions: {
           show: {
             apiType: ['dataApi'],
@@ -181,18 +194,18 @@ export class DataApi {
           },
         },
         default: {},
-        description: 'Additional options for Amazon API',
-        placeholder: 'Add Option',
+        description: 'Advanced options for Amazon API',
         options: [
           {
             displayName: 'Country',
             name: 'country',
             type: 'string',
             default: 'us',
-            description: 'The 2 letter country code where you want the product data to be scraped from (e.g., us, uk, ca, de, fr)',
+            description:
+              'The 2 letter country code to scrape data from (e.g., us, uk, ca, de, fr)',
           },
           {
-            displayName: 'TLD',
+            displayName: 'TLD (Top Level Domain)',
             name: 'tld',
             type: 'options',
             options: [
@@ -220,6 +233,794 @@ export class DataApi {
           },
         ],
       },
+
+      //
+      // eBay configuration
+      //
+      {
+        displayName: 'eBay API Type',
+        name: 'ebayApiType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+          },
+        },
+        options: [
+          {
+            name: 'Product API',
+            value: 'product',
+            description: 'Retrieve structured data for a specific eBay listing',
+          },
+          {
+            name: 'Search API',
+            value: 'search',
+            description: 'Retrieve structured search results for an eBay keyword or URL',
+          },
+          {
+            name: 'Feedback API',
+            value: 'feedback',
+            description: 'Retrieve seller or buyer feedback data from eBay profiles',
+          },
+          {
+            name: 'Category API',
+            value: 'category',
+            description: 'Retrieve structured product listings from eBay category pages',
+          },
+          {
+            name: 'Store API',
+            value: 'store',
+            description: 'Retrieve structured data from eBay storefronts by name or URL',
+          },
+        ],
+        default: 'product',
+        description: 'Type of eBay API to use',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebayProductInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['product'],
+          },
+        },
+        options: [
+          {
+            name: 'Item ID',
+            value: 'itemId',
+            description: 'Unique eBay item ID (e.g. 155616449358)',
+          },
+          {
+            name: 'Product URL',
+            value: 'url',
+            description: 'Full eBay product URL (encoded if necessary)',
+          },
+        ],
+        default: 'url',
+        description: 'Type of input for the eBay Product API request',
+      },
+      {
+        displayName: 'Item ID',
+        name: 'ebayProductItemId',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['product'],
+            ebayProductInputType: ['itemId'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'eBay item ID for the product you want to retrieve',
+      },
+      {
+        displayName: 'Product URL',
+        name: 'ebayProductUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['product'],
+            ebayProductInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full eBay product URL (remember to URL encode before sending)',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebaySearchInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['search'],
+          },
+        },
+        options: [
+          {
+            name: 'Query',
+            value: 'query',
+            description: 'Keyword or phrase to search for on eBay',
+          },
+          {
+            name: 'Search URL',
+            value: 'url',
+            description: 'Full eBay search results URL (URL encode before sending)',
+          },
+        ],
+        default: 'url',
+        description: 'Type of input for the eBay Search API request',
+      },
+      {
+        displayName: 'Search Query',
+        name: 'ebaySearchQuery',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['search'],
+            ebaySearchInputType: ['query'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Keyword or phrase to search for on eBay (e.g., laptop, sneakers)',
+      },
+      {
+        displayName: 'Search URL',
+        name: 'ebaySearchUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['search'],
+            ebaySearchInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full eBay search page URL (remember to URL encode before sending)',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebayFeedbackInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['feedback'],
+          },
+        },
+        options: [
+          {
+            name: 'Username',
+            value: 'username',
+            description: 'eBay username whose feedback page should be scraped',
+          },
+          {
+            name: 'Feedback URL',
+            value: 'url',
+            description: 'Full eBay feedback page URL (URL encode before sending)',
+          },
+        ],
+        default: 'url',
+        description: 'Type of input for the eBay Feedback API request',
+      },
+      {
+        displayName: 'Username',
+        name: 'ebayFeedbackUsername',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['feedback'],
+            ebayFeedbackInputType: ['username'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Exact eBay username to retrieve feedback for',
+      },
+      {
+        displayName: 'Feedback URL',
+        name: 'ebayFeedbackUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['feedback'],
+            ebayFeedbackInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full eBay feedback page URL (remember to URL encode before sending)',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebayCategoryInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['category'],
+          },
+        },
+        options: [
+          {
+            name: 'Category ID',
+            value: 'categoryId',
+            description:
+              'eBay numeric category ID (e.g. 1648276). The ID after bn_ in the URL (https://www.ebay.com/b/Laptops/bn_1648276) is 1648276',
+          },
+          {
+            name: 'Category URL',
+            value: 'url',
+            description: 'Full eBay category page URL (URL encode before sending)',
+          },
+        ],
+        default: 'url',
+        description: 'Type of input for the eBay Category API request',
+      },
+      {
+        displayName: 'Category ID',
+        name: 'ebayCategoryId',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['category'],
+            ebayCategoryInputType: ['categoryId'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'The eBay category identifier you want to scrape',
+      },
+      {
+        displayName: 'Category URL',
+        name: 'ebayCategoryUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['category'],
+            ebayCategoryInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full eBay category page URL (remember to URL encode before sending)',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'ebayStoreInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['store'],
+          },
+        },
+        options: [
+          {
+            name: 'Store Name',
+            value: 'storeName',
+            description: 'Public-facing eBay store name (e.g. mystore)',
+          },
+          {
+            name: 'Store URL',
+            value: 'url',
+            description: 'Full eBay store URL (URL encode before sending)',
+          },
+        ],
+        default: 'url',
+        description: 'Type of input for the eBay Store API request',
+      },
+      {
+        displayName: 'Store Name',
+        name: 'ebayStoreName',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['store'],
+            ebayStoreInputType: ['storeName'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Exact eBay storefront name you want to retrieve data for',
+      },
+      {
+        displayName: 'Store URL',
+        name: 'ebayStoreUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+            ebayApiType: ['store'],
+            ebayStoreInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full eBay store page URL (remember to URL encode before sending)',
+      },
+      {
+        displayName: 'Advanced Options',
+        name: 'ebayApiOptions',
+        type: 'collection',
+        placeholder: 'Add Option',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['ebay'],
+          },
+        },
+        default: {},
+        description: 'Advanced options for eBay API',
+        options: [],
+      },
+
+      //
+      // Walmart configuration
+      //
+      {
+        displayName: 'Walmart API Type',
+        name: 'walmartApiType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+          },
+        },
+        options: [
+          {
+            name: 'Product API',
+            value: 'product',
+            description: 'Get data for a specific Walmart product by Product ID or URL',
+          },
+          {
+            name: 'Product Search API',
+            value: 'search',
+            description: 'Search for Walmart products by keyword or search URL',
+          },
+          {
+            name: 'Review API',
+            value: 'review',
+            description: 'Retrieve review data for a Walmart product by Product ID or URL',
+          },
+          {
+            name: 'Shop API',
+            value: 'shop',
+            description: 'Retrieve data for a Walmart Shop by Shop ID or URL',
+          },
+          {
+            name: 'Browse API',
+            value: 'browse',
+            description: 'Retrieve data for a Walmart browse page by Browse Path or URL',
+          },
+          {
+            name: 'Category API',
+            value: 'category',
+            description: 'Retrieve data for a Walmart category by Category ID or URL',
+          },
+        ],
+        default: 'product',
+        description: 'Type of Walmart API to use',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'walmartProductInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['product'],
+          },
+        },
+        options: [
+          {
+            name: 'Product ID',
+            value: 'productId',
+            description: 'Walmart Product ID',
+          },
+          {
+            name: 'URL',
+            value: 'url',
+            description: 'Full Walmart product URL',
+          },
+        ],
+        default: 'url',
+        description: 'Type of input for Walmart Product API',
+      },
+      {
+        displayName: 'Product ID',
+        name: 'walmartProductId',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['product'],
+            walmartProductInputType: ['productId'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Walmart Product ID of the product to retrieve',
+      },
+      {
+        displayName: 'Product URL',
+        name: 'walmartProductUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['product'],
+            walmartProductInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full URL of the Walmart product page',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'walmartSearchInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['search'],
+          },
+        },
+        options: [
+          {
+            name: 'Query',
+            value: 'query',
+            description: 'Search query for Walmart products',
+          },
+          {
+            name: 'URL',
+            value: 'url',
+            description: 'Full Walmart search results URL',
+          },
+        ],
+        default: 'url',
+        description: 'Type of input for Walmart Product Search API',
+      },
+      {
+        displayName: 'Search Query',
+        name: 'walmartSearchQuery',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['search'],
+            walmartSearchInputType: ['query'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Search query for Walmart products',
+      },
+      {
+        displayName: 'Search URL',
+        name: 'walmartSearchUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['search'],
+            walmartSearchInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full Walmart search URL',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'walmartReviewInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['review'],
+          },
+        },
+        options: [
+          {
+            name: 'Product ID',
+            value: 'productId',
+            description: 'Walmart Product ID associated with the review page',
+          },
+          {
+            name: 'URL',
+            value: 'url',
+            description: 'Full Walmart review page URL',
+          },
+        ],
+        default: 'url',
+        description: 'Type of input for Walmart Review API',
+      },
+      {
+        displayName: 'Product ID',
+        name: 'walmartReviewProductId',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['review'],
+            walmartReviewInputType: ['productId'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Walmart Product ID of the item whose reviews should be retrieved',
+      },
+      {
+        displayName: 'Review URL',
+        name: 'walmartReviewUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['review'],
+            walmartReviewInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full URL of the Walmart review page',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'walmartShopInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['shop'],
+          },
+        },
+        options: [
+          {
+            name: 'Shop ID',
+            value: 'shopId',
+            description: 'Walmart Shop ID',
+          },
+          {
+            name: 'URL',
+            value: 'url',
+            description: 'Full Walmart shop page URL',
+          },
+        ],
+        default: 'url',
+        description: 'Type of input for Walmart Shop API',
+      },
+      {
+        displayName: 'Shop ID',
+        name: 'walmartShopId',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['shop'],
+            walmartShopInputType: ['shopId'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Walmart Shop ID to retrieve',
+      },
+      {
+        displayName: 'Shop URL',
+        name: 'walmartShopUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['shop'],
+            walmartShopInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full URL of the Walmart shop page',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'walmartBrowseInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['browse'],
+          },
+        },
+        options: [
+          {
+            name: 'Browse Path',
+            value: 'browsePath',
+            description: 'Walmart browse path (e.g. 3944_1060825_447913)',
+          },
+          {
+            name: 'URL',
+            value: 'url',
+            description: 'Full Walmart browse page URL',
+          },
+        ],
+        default: 'url',
+        description: 'Type of input for Walmart Browse API',
+      },
+      {
+        displayName: 'Browse Path',
+        name: 'walmartBrowsePath',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['browse'],
+            walmartBrowseInputType: ['browsePath'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Walmart browse path identifier',
+      },
+      {
+        displayName: 'Browse URL',
+        name: 'walmartBrowseUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['browse'],
+            walmartBrowseInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full Walmart browse page URL',
+      },
+      {
+        displayName: 'Input Type',
+        name: 'walmartCategoryInputType',
+        type: 'options',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['category'],
+          },
+        },
+        options: [
+          {
+            name: 'Category ID',
+            value: 'categoryId',
+            description: 'Walmart Category ID',
+          },
+          {
+            name: 'URL',
+            value: 'url',
+            description: 'Full Walmart category URL',
+          },
+        ],
+        default: 'url',
+        description: 'Type of input for Walmart Category API',
+      },
+      {
+        displayName: 'Category ID',
+        name: 'walmartCategoryId',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['category'],
+            walmartCategoryInputType: ['categoryId'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Walmart Category ID to retrieve',
+      },
+      {
+        displayName: 'Category URL',
+        name: 'walmartCategoryUrl',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+            walmartApiType: ['category'],
+            walmartCategoryInputType: ['url'],
+          },
+        },
+        default: '',
+        required: true,
+        description: 'Full Walmart category page URL',
+      },
+      {
+        displayName: 'Advanced Options',
+        name: 'walmartApiOptions',
+        type: 'collection',
+        placeholder: 'Add Option',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['walmart'],
+          },
+        },
+        default: {},
+        description: 'Advanced options for Walmart API',
+        options: [
+          {
+            displayName: 'Country',
+            name: 'country',
+            type: 'string',
+            default: 'us',
+            description:
+              'The 2 letter country code to scrape data from (e.g., us, ca, mx)',
+          },
+          {
+            displayName: 'TLD (Top Level Domain)',
+            name: 'tld',
+            type: 'options',
+            options: [
+              { name: '.CA (Canada)', value: 'ca' },
+              { name: '.CL (Chile)', value: 'cl' },
+              { name: '.COM (USA)', value: 'com' },
+              { name: '.COM.BR (Brazil)', value: 'com.br' },
+              { name: '.COM.MX (Mexico)', value: 'com.mx' },
+            ],
+            default: 'com',
+            description: 'The Walmart domain to scrape from',
+          },
+        ],
+      },
+      //
+      // Indeed configuration
+      //
       {
         displayName: 'Indeed API Type',
         name: 'indeedApiType',
@@ -258,7 +1059,7 @@ export class DataApi {
           { name: 'Query', value: 'query', description: 'Search using a query string and optional filters' },
           { name: 'URL', value: 'url', description: 'Provide a full Indeed job search URL' },
         ],
-        default: 'query',
+        default: 'url',
         description: 'Select how to identify the job search results',
       },
       {
@@ -308,7 +1109,7 @@ export class DataApi {
           { name: 'Job ID', value: 'jobId', description: 'Provide the Indeed job ID' },
           { name: 'URL', value: 'url', description: 'Provide the full job detail URL' },
         ],
-        default: 'jobId',
+        default: 'url',
         description: 'Select how to identify the job detail data',
       },
       {
@@ -344,55 +1145,6 @@ export class DataApi {
         description: 'Full Indeed job detail URL',
       },
       {
-        displayName: 'Advanced Options',
-        name: 'indeedJobDetailOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['indeed'],
-            indeedApiType: ['jobDetail'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the job detail endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Two letter country code to scrape data from (e.g., us, uk, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CO.UK (UK)', value: 'co.uk' },
-              { name: '.CA (Canada)', value: 'ca' },
-              { name: '.DE (Germany)', value: 'de' },
-              { name: '.FR (France)', value: 'fr' },
-              { name: '.IT (Italy)', value: 'it' },
-              { name: '.ES (Spain)', value: 'es' },
-              { name: '.NL (Netherlands)', value: 'nl' },
-              { name: '.PL (Poland)', value: 'pl' },
-              { name: '.IN (India)', value: 'co.in' },
-              { name: '.AU (Australia)', value: 'com.au' },
-              { name: '.JP (Japan)', value: 'jp' },
-              { name: '.MX (Mexico)', value: 'com.mx' },
-              { name: '.BR (Brazil)', value: 'com.br' },
-              { name: '.SA (Saudi Arabia)', value: 'com.sa' },
-              { name: '.AE (United Arab Emirates)', value: 'ae' },
-            ],
-            default: 'com',
-            description: 'Indeed domain to scrape from',
-          },
-        ],
-      },
-      {
         displayName: 'Input Type',
         name: 'indeedCompanySearchInputType',
         type: 'options',
@@ -407,7 +1159,7 @@ export class DataApi {
           { name: 'Query', value: 'query', description: 'Search using a company query' },
           { name: 'URL', value: 'url', description: 'Provide a full company search URL' },
         ],
-        default: 'query',
+        default: 'url',
         description: 'Select how to identify the company search results',
       },
       {
@@ -454,11 +1206,26 @@ export class DataApi {
           },
         },
         options: [
-          { name: 'Filters', value: 'filters', description: 'Use industry/location filters' },
+          { name: 'Parameters', value: 'parameters', description: 'Use industry as parameter' },
           { name: 'URL', value: 'url', description: 'Provide a full top companies URL' },
         ],
-        default: 'filters',
+        default: 'url',
         description: 'Select how to fetch the top companies data',
+      },
+      {
+        displayName: 'Industry',
+        name: 'indeedTopCompaniesIndustry',
+        type: 'string',
+        displayOptions: {
+          show: {
+            apiType: ['dataApi'],
+            dataDomain: ['indeed'],
+            indeedApiType: ['topCompanies'],
+            indeedTopCompaniesInputType: ['parameters'],
+          },
+        },
+        default: '',
+        description: 'Industry filter for the top companies endpoint (e.g., Technology)',
       },
       {
         displayName: 'Top Companies URL',
@@ -491,7 +1258,7 @@ export class DataApi {
           { name: 'Company ID', value: 'companyId', description: 'Provide the Indeed company ID' },
           { name: 'URL', value: 'url', description: 'Provide the full company snapshot URL' },
         ],
-        default: 'companyId',
+        default: 'url',
         description: 'Select how to identify the company snapshot data',
       },
       {
@@ -527,55 +1294,6 @@ export class DataApi {
         description: 'Full Indeed company snapshot URL',
       },
       {
-        displayName: 'Advanced Options',
-        name: 'indeedCompanySnapshotOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['indeed'],
-            indeedApiType: ['companySnapshot'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the company snapshot endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Two letter country code to scrape data from (e.g., us, uk, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CO.UK (UK)', value: 'co.uk' },
-              { name: '.CA (Canada)', value: 'ca' },
-              { name: '.DE (Germany)', value: 'de' },
-              { name: '.FR (France)', value: 'fr' },
-              { name: '.IT (Italy)', value: 'it' },
-              { name: '.ES (Spain)', value: 'es' },
-              { name: '.NL (Netherlands)', value: 'nl' },
-              { name: '.PL (Poland)', value: 'pl' },
-              { name: '.IN (India)', value: 'co.in' },
-              { name: '.AU (Australia)', value: 'com.au' },
-              { name: '.JP (Japan)', value: 'jp' },
-              { name: '.MX (Mexico)', value: 'com.mx' },
-              { name: '.BR (Brazil)', value: 'com.br' },
-              { name: '.SA (Saudi Arabia)', value: 'com.sa' },
-              { name: '.AE (United Arab Emirates)', value: 'ae' },
-            ],
-            default: 'com',
-            description: 'Indeed domain to scrape from',
-          },
-        ],
-      },
-      {
         displayName: 'Input Type',
         name: 'indeedCompanyAboutInputType',
         type: 'options',
@@ -590,7 +1308,7 @@ export class DataApi {
           { name: 'Company ID', value: 'companyId', description: 'Provide the Indeed company ID' },
           { name: 'URL', value: 'url', description: 'Provide the full company about URL' },
         ],
-        default: 'companyId',
+        default: 'url',
         description: 'Select how to identify the company about data',
       },
       {
@@ -626,55 +1344,6 @@ export class DataApi {
         description: 'Full Indeed company about URL',
       },
       {
-        displayName: 'Advanced Options',
-        name: 'indeedCompanyAboutOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['indeed'],
-            indeedApiType: ['companyAbout'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the company about endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Two letter country code to scrape data from (e.g., us, uk, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CO.UK (UK)', value: 'co.uk' },
-              { name: '.CA (Canada)', value: 'ca' },
-              { name: '.DE (Germany)', value: 'de' },
-              { name: '.FR (France)', value: 'fr' },
-              { name: '.IT (Italy)', value: 'it' },
-              { name: '.ES (Spain)', value: 'es' },
-              { name: '.NL (Netherlands)', value: 'nl' },
-              { name: '.PL (Poland)', value: 'pl' },
-              { name: '.IN (India)', value: 'co.in' },
-              { name: '.AU (Australia)', value: 'com.au' },
-              { name: '.JP (Japan)', value: 'jp' },
-              { name: '.MX (Mexico)', value: 'com.mx' },
-              { name: '.BR (Brazil)', value: 'com.br' },
-              { name: '.SA (Saudi Arabia)', value: 'com.sa' },
-              { name: '.AE (United Arab Emirates)', value: 'ae' },
-            ],
-            default: 'com',
-            description: 'Indeed domain to scrape from',
-          },
-        ],
-      },
-      {
         displayName: 'Input Type',
         name: 'indeedCompanyReviewsInputType',
         type: 'options',
@@ -689,7 +1358,7 @@ export class DataApi {
           { name: 'Company ID', value: 'companyId', description: 'Provide the Indeed company ID' },
           { name: 'URL', value: 'url', description: 'Provide the full company reviews URL' },
         ],
-        default: 'companyId',
+        default: 'url',
         description: 'Select how to identify the company reviews data',
       },
       {
@@ -739,7 +1408,7 @@ export class DataApi {
           { name: 'Company ID', value: 'companyId', description: 'Provide the Indeed company ID' },
           { name: 'URL', value: 'url', description: 'Provide the full company jobs URL' },
         ],
-        default: 'companyId',
+        default: 'url',
         description: 'Select how to identify the company jobs data',
       },
       {
@@ -776,28 +1445,27 @@ export class DataApi {
       },
       {
         displayName: 'Advanced Options',
-        name: 'indeedJobSearchOptions',
+        name: 'indeedApiOptions',
         type: 'collection',
         placeholder: 'Add Option',
         displayOptions: {
           show: {
             apiType: ['dataApi'],
             dataDomain: ['indeed'],
-            indeedApiType: ['jobSearch'],
           },
         },
         default: {},
-        description: 'Advanced options specific to the job search endpoint',
+        description: 'Advanced options for Indeed API',
         options: [
           {
             displayName: 'Country',
             name: 'country',
             type: 'string',
             default: 'us',
-            description: 'Two letter country code to scrape data from (e.g., us, uk, ca)',
+            description: 'The 2 letter country code to scrape data from (e.g., us, uk, ca)',
           },
           {
-            displayName: 'TLD',
+            displayName: 'TLD (Top Level Domain)',
             name: 'tld',
             type: 'options',
             options: [
@@ -819,433 +1487,13 @@ export class DataApi {
               { name: '.AE (United Arab Emirates)', value: 'ae' },
             ],
             default: 'com',
-            description: 'Indeed domain to scrape from',
-          },
-          {
-            displayName: 'Location',
-            name: 'location',
-            type: 'string',
-            default: '',
-            description: 'Geographic location filter (e.g., New York, San Francisco)',
-          },
-          {
-            displayName: 'Job Type',
-            name: 'job_type',
-            type: 'string',
-            default: '',
-            description: 'Job type filter (e.g., fulltime, parttime, contract)',
-          },
-          {
-            displayName: 'Sort',
-            name: 'sort',
-            type: 'string',
-            default: '',
-            description: 'Sort order (e.g., relevance, date, salary, rating)',
-          },
-          {
-            displayName: 'Start',
-            name: 'start',
-            type: 'number',
-            typeOptions: {
-              minValue: 0,
-              numberPrecision: 0,
-            },
-            default: 0,
-            description: 'Pagination offset. Leave at 0 to start from the first result.',
-          },
-          {
-            displayName: 'Radius (miles)',
-            name: 'radius',
-            type: 'number',
-            typeOptions: {
-              minValue: 0,
-            },
-            default: 0,
-            description: 'Search radius in miles. Leave at 0 to omit.',
-          },
-          {
-            displayName: 'Job Age (days)',
-            name: 'fromage',
-            type: 'number',
-            typeOptions: {
-              minValue: 0,
-            },
-            default: 0,
-            description: 'Filter jobs by age in days (e.g., 1, 3, 7, 14, 30). Leave at 0 to omit.',
-          },
-          {
-            displayName: 'Salary Filter',
-            name: 'salary',
-            type: 'string',
-            default: '',
-            description: 'Salary filter string for the job search endpoint',
-          },
-          {
-            displayName: 'Remote Filter',
-            name: 'remote',
-            type: 'string',
-            default: '',
-            description: 'Remote work filter (e.g., remote, hybrid, onsite)',
+            description: 'The Indeed domain to scrape from',
           },
         ],
       },
-      {
-        displayName: 'Advanced Options',
-        name: 'indeedCompanySearchOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['indeed'],
-            indeedApiType: ['companySearch'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the company search endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Two letter country code to scrape data from (e.g., us, uk, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CO.UK (UK)', value: 'co.uk' },
-              { name: '.CA (Canada)', value: 'ca' },
-              { name: '.DE (Germany)', value: 'de' },
-              { name: '.FR (France)', value: 'fr' },
-              { name: '.IT (Italy)', value: 'it' },
-              { name: '.ES (Spain)', value: 'es' },
-              { name: '.NL (Netherlands)', value: 'nl' },
-              { name: '.PL (Poland)', value: 'pl' },
-              { name: '.IN (India)', value: 'co.in' },
-              { name: '.AU (Australia)', value: 'com.au' },
-              { name: '.JP (Japan)', value: 'jp' },
-              { name: '.MX (Mexico)', value: 'com.mx' },
-              { name: '.BR (Brazil)', value: 'com.br' },
-              { name: '.SA (Saudi Arabia)', value: 'com.sa' },
-              { name: '.AE (United Arab Emirates)', value: 'ae' },
-            ],
-            default: 'com',
-            description: 'Indeed domain to scrape from',
-          },
-          {
-            displayName: 'Location',
-            name: 'location',
-            type: 'string',
-            default: '',
-            description: 'Geographic location filter (e.g., New York, San Francisco)',
-          },
-          {
-            displayName: 'Sort',
-            name: 'sort',
-            type: 'string',
-            default: '',
-            description: 'Sort order (e.g., relevance, date, salary, rating)',
-          },
-          {
-            displayName: 'Start',
-            name: 'start',
-            type: 'number',
-            typeOptions: {
-              minValue: 0,
-              numberPrecision: 0,
-            },
-            default: 0,
-            description: 'Pagination offset. Leave at 0 to start from the first result.',
-          },
-          {
-            displayName: 'Radius (miles)',
-            name: 'radius',
-            type: 'number',
-            typeOptions: {
-              minValue: 0,
-            },
-            default: 0,
-            description: 'Search radius in miles. Leave at 0 to omit.',
-          },
-        ],
-      },
-      {
-        displayName: 'Advanced Options',
-        name: 'indeedTopCompaniesOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['indeed'],
-            indeedApiType: ['topCompanies'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the top companies endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Two letter country code to scrape data from (e.g., us, uk, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CO.UK (UK)', value: 'co.uk' },
-              { name: '.CA (Canada)', value: 'ca' },
-              { name: '.DE (Germany)', value: 'de' },
-              { name: '.FR (France)', value: 'fr' },
-              { name: '.IT (Italy)', value: 'it' },
-              { name: '.ES (Spain)', value: 'es' },
-              { name: '.NL (Netherlands)', value: 'nl' },
-              { name: '.PL (Poland)', value: 'pl' },
-              { name: '.IN (India)', value: 'co.in' },
-              { name: '.AU (Australia)', value: 'com.au' },
-              { name: '.JP (Japan)', value: 'jp' },
-              { name: '.MX (Mexico)', value: 'com.mx' },
-              { name: '.BR (Brazil)', value: 'com.br' },
-              { name: '.SA (Saudi Arabia)', value: 'com.sa' },
-              { name: '.AE (United Arab Emirates)', value: 'ae' },
-            ],
-            default: 'com',
-            description: 'Indeed domain to scrape from',
-          },
-          {
-            displayName: 'Location',
-            name: 'location',
-            type: 'string',
-            default: '',
-            description: 'Geographic location filter (e.g., New York, San Francisco)',
-          },
-          {
-            displayName: 'Industry',
-            name: 'industry',
-            type: 'string',
-            default: '',
-            description: 'Industry filter for the top companies endpoint (e.g., Technology)',
-          },
-          {
-            displayName: 'Sort',
-            name: 'sort',
-            type: 'string',
-            default: '',
-            description: 'Sort order (e.g., relevance, date, salary, rating)',
-          },
-          {
-            displayName: 'Start',
-            name: 'start',
-            type: 'number',
-            typeOptions: {
-              minValue: 0,
-              numberPrecision: 0,
-            },
-            default: 0,
-            description: 'Pagination offset. Leave at 0 to start from the first result.',
-          },
-          {
-            displayName: 'Radius (miles)',
-            name: 'radius',
-            type: 'number',
-            typeOptions: {
-              minValue: 0,
-            },
-            default: 0,
-            description: 'Search radius in miles. Leave at 0 to omit.',
-          },
-        ],
-      },
-      {
-        displayName: 'Advanced Options',
-        name: 'indeedCompanyReviewsOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['indeed'],
-            indeedApiType: ['companyReviews'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the company reviews endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Two letter country code to scrape data from (e.g., us, uk, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CO.UK (UK)', value: 'co.uk' },
-              { name: '.CA (Canada)', value: 'ca' },
-              { name: '.DE (Germany)', value: 'de' },
-              { name: '.FR (France)', value: 'fr' },
-              { name: '.IT (Italy)', value: 'it' },
-              { name: '.ES (Spain)', value: 'es' },
-              { name: '.NL (Netherlands)', value: 'nl' },
-              { name: '.PL (Poland)', value: 'pl' },
-              { name: '.IN (India)', value: 'co.in' },
-              { name: '.AU (Australia)', value: 'com.au' },
-              { name: '.JP (Japan)', value: 'jp' },
-              { name: '.MX (Mexico)', value: 'com.mx' },
-              { name: '.BR (Brazil)', value: 'com.br' },
-              { name: '.SA (Saudi Arabia)', value: 'com.sa' },
-              { name: '.AE (United Arab Emirates)', value: 'ae' },
-            ],
-            default: 'com',
-            description: 'Indeed domain to scrape from',
-          },
-          {
-            displayName: 'Sort',
-            name: 'sort',
-            type: 'string',
-            default: '',
-            description: 'Sort order (e.g., relevance, date, salary, rating)',
-          },
-          {
-            displayName: 'Start',
-            name: 'start',
-            type: 'number',
-            typeOptions: {
-              minValue: 0,
-              numberPrecision: 0,
-            },
-            default: 0,
-            description: 'Pagination offset. Leave at 0 to start from the first result.',
-          },
-        ],
-      },
-      {
-        displayName: 'Advanced Options',
-        name: 'indeedCompanyJobsOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['indeed'],
-            indeedApiType: ['companyJobs'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the company jobs endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Two letter country code to scrape data from (e.g., us, uk, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CO.UK (UK)', value: 'co.uk' },
-              { name: '.CA (Canada)', value: 'ca' },
-              { name: '.DE (Germany)', value: 'de' },
-              { name: '.FR (France)', value: 'fr' },
-              { name: '.IT (Italy)', value: 'it' },
-              { name: '.ES (Spain)', value: 'es' },
-              { name: '.NL (Netherlands)', value: 'nl' },
-              { name: '.PL (Poland)', value: 'pl' },
-              { name: '.IN (India)', value: 'co.in' },
-              { name: '.AU (Australia)', value: 'com.au' },
-              { name: '.JP (Japan)', value: 'jp' },
-              { name: '.MX (Mexico)', value: 'com.mx' },
-              { name: '.BR (Brazil)', value: 'com.br' },
-              { name: '.SA (Saudi Arabia)', value: 'com.sa' },
-              { name: '.AE (United Arab Emirates)', value: 'ae' },
-            ],
-            default: 'com',
-            description: 'Indeed domain to scrape from',
-          },
-          {
-            displayName: 'Location',
-            name: 'location',
-            type: 'string',
-            default: '',
-            description: 'Geographic location filter (e.g., New York, San Francisco)',
-          },
-          {
-            displayName: 'Job Type',
-            name: 'job_type',
-            type: 'string',
-            default: '',
-            description: 'Job type filter (e.g., fulltime, parttime, contract)',
-          },
-          {
-            displayName: 'Sort',
-            name: 'sort',
-            type: 'string',
-            default: '',
-            description: 'Sort order (e.g., relevance, date, salary, rating)',
-          },
-          {
-            displayName: 'Start',
-            name: 'start',
-            type: 'number',
-            typeOptions: {
-              minValue: 0,
-              numberPrecision: 0,
-            },
-            default: 0,
-            description: 'Pagination offset. Leave at 0 to start from the first result.',
-          },
-          {
-            displayName: 'Radius (miles)',
-            name: 'radius',
-            type: 'number',
-            typeOptions: {
-              minValue: 0,
-            },
-            default: 0,
-            description: 'Search radius in miles. Leave at 0 to omit.',
-          },
-          {
-            displayName: 'Job Age (days)',
-            name: 'fromage',
-            type: 'number',
-            typeOptions: {
-              minValue: 0,
-            },
-            default: 0,
-            description: 'Filter jobs by age in days (e.g., 1, 3, 7, 14, 30). Leave at 0 to omit.',
-          },
-          {
-            displayName: 'Salary Filter',
-            name: 'salary',
-            type: 'string',
-            default: '',
-            description: 'Salary filter string for the company jobs endpoint',
-          },
-          {
-            displayName: 'Remote Filter',
-            name: 'remote',
-            type: 'string',
-            default: '',
-            description: 'Remote work filter (e.g., remote, hybrid, onsite)',
-          },
-        ],
-      },
+      //
+      // Redfin configuration
+      //
       {
         displayName: 'Redfin API Type',
         name: 'redfinApiType',
@@ -1284,7 +1532,7 @@ export class DataApi {
           { name: 'Parameters', value: 'parameters', description: 'Provide city/state details manually' },
           { name: 'URL', value: 'url', description: 'Provide the full Redfin sale search URL' },
         ],
-        default: 'parameters',
+        default: 'url',
         description: 'Choose how to identify the sale search page',
       },
       {
@@ -1352,41 +1600,6 @@ export class DataApi {
         description: 'City name (spaces allowed)',
       },
       {
-        displayName: 'Advanced Options',
-        name: 'redfinSaleSearchOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['redfin'],
-            redfinApiType: ['saleSearch'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the sale search endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Proxy geotargeting country code (e.g., us, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CA (Canada)', value: 'ca' },
-            ],
-            default: 'com',
-            description: 'Optional Redfin TLD override',
-          },
-        ],
-      },
-      {
         displayName: 'Input Type',
         name: 'redfinRentSearchInputType',
         type: 'options',
@@ -1401,7 +1614,7 @@ export class DataApi {
           { name: 'Parameters', value: 'parameters', description: 'Provide city/state details manually' },
           { name: 'URL', value: 'url', description: 'Provide the full Redfin rentals search URL' },
         ],
-        default: 'parameters',
+        default: 'url',
         description: 'Choose how to identify the rentals search page',
       },
       {
@@ -1467,41 +1680,6 @@ export class DataApi {
         default: '',
         required: true,
         description: 'City name (spaces allowed)',
-      },
-      {
-        displayName: 'Advanced Options',
-        name: 'redfinRentSearchOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['redfin'],
-            redfinApiType: ['rentSearch'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the rent search endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Proxy geotargeting country code (e.g., us, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CA (Canada)', value: 'ca' },
-            ],
-            default: 'com',
-            description: 'Optional Redfin TLD override',
-          },
-        ],
       },
       {
         displayName: 'Input Type',
@@ -1586,41 +1764,6 @@ export class DataApi {
         description: 'Redfin home ID',
       },
       {
-        displayName: 'Advanced Options',
-        name: 'redfinSaleDetailOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['redfin'],
-            redfinApiType: ['saleDetail'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the sale detail endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Proxy geotargeting country code (e.g., us, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CA (Canada)', value: 'ca' },
-            ],
-            default: 'com',
-            description: 'Optional Redfin TLD override',
-          },
-        ],
-      },
-      {
         displayName: 'Input Type',
         name: 'redfinRentDetailInputType',
         type: 'options',
@@ -1701,41 +1844,6 @@ export class DataApi {
         default: '',
         required: true,
         description: 'Redfin rental property ID',
-      },
-      {
-        displayName: 'Advanced Options',
-        name: 'redfinRentDetailOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['redfin'],
-            redfinApiType: ['rentDetail'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the rent detail endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Proxy geotargeting country code (e.g., us, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CA (Canada)', value: 'ca' },
-            ],
-            default: 'com',
-            description: 'Optional Redfin TLD override',
-          },
-        ],
       },
       {
         displayName: 'Input Type',
@@ -1851,41 +1959,6 @@ export class DataApi {
         description: 'Redfin building ID',
       },
       {
-        displayName: 'Advanced Options',
-        name: 'redfinBuildingDetailOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['redfin'],
-            redfinApiType: ['buildingDetail'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the building detail endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Proxy geotargeting country code (e.g., us, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CA (Canada)', value: 'ca' },
-            ],
-            default: 'com',
-            description: 'Optional Redfin TLD override',
-          },
-        ],
-      },
-      {
         displayName: 'Input Type',
         name: 'redfinStateSearchInputType',
         type: 'options',
@@ -1900,7 +1973,7 @@ export class DataApi {
           { name: 'Parameters', value: 'parameters', description: 'Provide the state code' },
           { name: 'URL', value: 'url', description: 'Provide the full state page URL' },
         ],
-        default: 'parameters',
+        default: 'url',
         description: 'Choose how to identify the state search page',
       },
       {
@@ -1936,41 +2009,6 @@ export class DataApi {
         description: 'State code (e.g., NY)',
       },
       {
-        displayName: 'Advanced Options',
-        name: 'redfinStateSearchOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['redfin'],
-            redfinApiType: ['stateSearch'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the state search endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Proxy geotargeting country code (e.g., us, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CA (Canada)', value: 'ca' },
-            ],
-            default: 'com',
-            description: 'Optional Redfin TLD override',
-          },
-        ],
-      },
-      {
         displayName: 'Input Type',
         name: 'redfinAgentSearchInputType',
         type: 'options',
@@ -1985,7 +2023,7 @@ export class DataApi {
           { name: 'Parameters', value: 'parameters', description: 'Provide city/state details manually' },
           { name: 'URL', value: 'url', description: 'Provide the full agent search URL' },
         ],
-        default: 'parameters',
+        default: 'url',
         description: 'Choose how to identify the agent search results',
       },
       {
@@ -2053,41 +2091,6 @@ export class DataApi {
         description: 'City name',
       },
       {
-        displayName: 'Advanced Options',
-        name: 'redfinAgentSearchOptions',
-        type: 'collection',
-        placeholder: 'Add Option',
-        displayOptions: {
-          show: {
-            apiType: ['dataApi'],
-            dataDomain: ['redfin'],
-            redfinApiType: ['agentSearch'],
-          },
-        },
-        default: {},
-        description: 'Advanced options specific to the agent search endpoint',
-        options: [
-          {
-            displayName: 'Country',
-            name: 'country',
-            type: 'string',
-            default: 'us',
-            description: 'Proxy geotargeting country code (e.g., us, ca)',
-          },
-          {
-            displayName: 'TLD',
-            name: 'tld',
-            type: 'options',
-            options: [
-              { name: '.COM (US)', value: 'com' },
-              { name: '.CA (Canada)', value: 'ca' },
-            ],
-            default: 'com',
-            description: 'Optional Redfin TLD override',
-          },
-        ],
-      },
-      {
         displayName: 'Input Type',
         name: 'redfinAgentProfileInputType',
         type: 'options',
@@ -2102,7 +2105,7 @@ export class DataApi {
           { name: 'Agent Slug', value: 'agent', description: 'Provide the agent slug' },
           { name: 'URL', value: 'url', description: 'Provide the full agent profile URL' },
         ],
-        default: 'agent',
+        default: 'url',
         description: 'Choose how to identify the agent profile',
       },
       {
@@ -2139,28 +2142,27 @@ export class DataApi {
       },
       {
         displayName: 'Advanced Options',
-        name: 'redfinAgentProfileOptions',
+        name: 'redfinApiOptions',
         type: 'collection',
         placeholder: 'Add Option',
         displayOptions: {
           show: {
             apiType: ['dataApi'],
             dataDomain: ['redfin'],
-            redfinApiType: ['agentProfile'],
           },
         },
         default: {},
-        description: 'Advanced options specific to the agent profile endpoint',
+        description: 'Advanced options for Redfin API',
         options: [
           {
             displayName: 'Country',
             name: 'country',
             type: 'string',
             default: 'us',
-            description: 'Proxy geotargeting country code (e.g., us, ca)',
+            description: 'The 2 letter country code to scrape data from (e.g., us, ca)',
           },
           {
-            displayName: 'TLD',
+            displayName: 'TLD (Top Level Domain)',
             name: 'tld',
             type: 'options',
             options: [
@@ -2168,7 +2170,7 @@ export class DataApi {
               { name: '.CA (Canada)', value: 'ca' },
             ],
             default: 'com',
-            description: 'Optional Redfin TLD override',
+            description: 'The Redfin domain to scrape from',
           },
         ],
       },
@@ -2186,14 +2188,17 @@ export class DataApi {
 
     if (dataDomain === 'amazon') {
       const amazonApiType = this.getNodeParameter('amazonApiType', index) as string;
-      const amazonApiOptions = this.getNodeParameter('amazonApiOptions', index, {}) as IAmazonApiOptions;
+      const amazonApiOptions = this.getNodeParameter(
+        'amazonApiOptions',
+        index,
+        {},
+      ) as IAmazonApiOptions;
 
       if (amazonApiOptions.country) qsParams.country = amazonApiOptions.country;
       if (amazonApiOptions.tld) qsParams.tld = amazonApiOptions.tld;
 
       if (amazonApiType === 'product') {
         baseUrl = `${API_BASE_URL}/structured-data/amazon/product`;
-
         const inputType = this.getNodeParameter('amazonProductInputType', index) as string;
 
         if (inputType === 'asin') {
@@ -2205,7 +2210,6 @@ export class DataApi {
         }
       } else if (amazonApiType === 'search') {
         baseUrl = `${API_BASE_URL}/structured-data/amazon/search`;
-
         const inputType = this.getNodeParameter('amazonSearchInputType', index) as string;
 
         if (inputType === 'query') {
@@ -2215,6 +2219,161 @@ export class DataApi {
           const url = this.getNodeParameter('amazonSearchUrl', index) as string;
           qsParams.url = url;
         }
+      } else {
+        throw new NodeOperationError(
+          this.getNode(),
+          `Unsupported Amazon API type: ${amazonApiType}. Please select a valid API type.`,
+          { itemIndex: index },
+        );
+      }
+    } else if (dataDomain === 'ebay') {
+      const ebayApiType = this.getNodeParameter('ebayApiType', index) as string;
+
+      if (ebayApiType === 'product') {
+        baseUrl = `${API_BASE_URL}/structured-data/ebay/product`;
+        const inputType = this.getNodeParameter('ebayProductInputType', index) as string;
+
+        if (inputType === 'itemId') {
+          const itemId = this.getNodeParameter('ebayProductItemId', index) as string;
+          qsParams.item_id = itemId;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebayProductUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (ebayApiType === 'search') {
+        baseUrl = `${API_BASE_URL}/structured-data/ebay/search`;
+        const inputType = this.getNodeParameter('ebaySearchInputType', index) as string;
+
+        if (inputType === 'query') {
+          const query = this.getNodeParameter('ebaySearchQuery', index) as string;
+          qsParams.query = query;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebaySearchUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (ebayApiType === 'feedback') {
+        baseUrl = `${API_BASE_URL}/structured-data/ebay/feedback`;
+        const inputType = this.getNodeParameter('ebayFeedbackInputType', index) as string;
+
+        if (inputType === 'username') {
+          const username = this.getNodeParameter('ebayFeedbackUsername', index) as string;
+          qsParams.username = username;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebayFeedbackUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (ebayApiType === 'category') {
+        baseUrl = `${API_BASE_URL}/structured-data/ebay/category`;
+        const inputType = this.getNodeParameter('ebayCategoryInputType', index) as string;
+
+        if (inputType === 'categoryId') {
+          const categoryId = this.getNodeParameter('ebayCategoryId', index) as string;
+          qsParams.category_id = categoryId;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebayCategoryUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (ebayApiType === 'store') {
+        baseUrl = `${API_BASE_URL}/structured-data/ebay/store`;
+        const inputType = this.getNodeParameter('ebayStoreInputType', index) as string;
+
+        if (inputType === 'storeName') {
+          const storeName = this.getNodeParameter('ebayStoreName', index) as string;
+          qsParams.store_name = storeName;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('ebayStoreUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else {
+        throw new NodeOperationError(
+          this.getNode(),
+          `Unsupported eBay API type: ${ebayApiType}. Please select product, search, feedback, category, or store.`,
+          { itemIndex: index },
+        );
+      }
+    } else if (dataDomain === 'walmart') {
+      const walmartApiType = this.getNodeParameter('walmartApiType', index) as string;
+      const walmartApiOptions = this.getNodeParameter(
+        'walmartApiOptions',
+        index,
+        {},
+      ) as IWalmartApiOptions;
+
+      if (walmartApiOptions.country) qsParams.country = walmartApiOptions.country;
+      if (walmartApiOptions.tld) qsParams.tld = walmartApiOptions.tld;
+
+      if (walmartApiType === 'product') {
+        baseUrl = `${API_BASE_URL}/structured-data/walmart/product`;
+        const inputType = this.getNodeParameter('walmartProductInputType', index) as string;
+
+        if (inputType === 'productId') {
+          const productId = this.getNodeParameter('walmartProductId', index) as string;
+          qsParams.product_id = productId;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('walmartProductUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (walmartApiType === 'search') {
+        baseUrl = `${API_BASE_URL}/structured-data/walmart/search`;
+        const inputType = this.getNodeParameter('walmartSearchInputType', index) as string;
+
+        if (inputType === 'query') {
+          const query = this.getNodeParameter('walmartSearchQuery', index) as string;
+          qsParams.query = query;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('walmartSearchUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (walmartApiType === 'review') {
+        baseUrl = `${API_BASE_URL}/structured-data/walmart/reviews`;
+        const inputType = this.getNodeParameter('walmartReviewInputType', index) as string;
+
+        if (inputType === 'productId') {
+          const productId = this.getNodeParameter('walmartReviewProductId', index) as string;
+          qsParams.product_id = productId;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('walmartReviewUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (walmartApiType === 'shop') {
+        baseUrl = `${API_BASE_URL}/structured-data/walmart/shop`;
+        const inputType = this.getNodeParameter('walmartShopInputType', index) as string;
+
+        if (inputType === 'shopId') {
+          const shopId = this.getNodeParameter('walmartShopId', index) as string;
+          qsParams.shop_id = shopId;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('walmartShopUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (walmartApiType === 'browse') {
+        baseUrl = `${API_BASE_URL}/structured-data/walmart/browse`;
+        const inputType = this.getNodeParameter('walmartBrowseInputType', index) as string;
+
+        if (inputType === 'browsePath') {
+          const browsePath = this.getNodeParameter('walmartBrowsePath', index) as string;
+          qsParams.browse_path = browsePath;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('walmartBrowseUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else if (walmartApiType === 'category') {
+        baseUrl = `${API_BASE_URL}/structured-data/walmart/category`;
+        const inputType = this.getNodeParameter('walmartCategoryInputType', index) as string;
+
+        if (inputType === 'categoryId') {
+          const categoryId = this.getNodeParameter('walmartCategoryId', index) as string;
+          qsParams.category_id = categoryId;
+        } else if (inputType === 'url') {
+          const url = this.getNodeParameter('walmartCategoryUrl', index) as string;
+          qsParams.url = url;
+        }
+      } else {
+        throw new NodeOperationError(
+          this.getNode(),
+          `Unsupported Walmart API type: ${walmartApiType}. Please select product, search, review, shop, browse, or category.`,
+          { itemIndex: index },
+        );
       }
     } else if (dataDomain === 'indeed') {
       const indeedApiType = this.getNodeParameter('indeedApiType', index) as string;
@@ -2266,6 +2425,11 @@ export class DataApi {
           if (inputType === 'url') {
             const url = this.getNodeParameter('indeedTopCompaniesUrl', index) as string;
             qsParams.url = url;
+          } else {
+            const industry = this.getNodeParameter('indeedTopCompaniesIndustry', index, '') as string;
+            if (industry) {
+              qsParams.industry = industry;
+            }
           }
           break;
         }
@@ -2322,85 +2486,21 @@ export class DataApi {
           break;
         }
         default:
-          throw new NodeOperationError(this.getNode(), `Unsupported Indeed API type: ${indeedApiType}`, {
-            itemIndex: index,
-          });
+          throw new NodeOperationError(
+            this.getNode(),
+            `Unsupported Indeed API type: ${indeedApiType}`,
+            { itemIndex: index },
+          );
       }
 
-      const indeedApiOptions: IIndeedApiOptions = {};
-
-      const mergeIndeedOptions = (parameterName: string) => {
-        const extraOptions = this.getNodeParameter(parameterName, index, {}) as IIndeedApiOptions;
-        Object.assign(indeedApiOptions, extraOptions);
-      };
-
-      switch (indeedApiType) {
-        case 'jobSearch':
-          mergeIndeedOptions('indeedJobSearchOptions');
-          break;
-        case 'jobDetail':
-          mergeIndeedOptions('indeedJobDetailOptions');
-          break;
-        case 'companySearch':
-          mergeIndeedOptions('indeedCompanySearchOptions');
-          break;
-        case 'topCompanies':
-          mergeIndeedOptions('indeedTopCompaniesOptions');
-          break;
-        case 'companySnapshot':
-          mergeIndeedOptions('indeedCompanySnapshotOptions');
-          break;
-        case 'companyAbout':
-          mergeIndeedOptions('indeedCompanyAboutOptions');
-          break;
-        case 'companyReviews':
-          mergeIndeedOptions('indeedCompanyReviewsOptions');
-          break;
-        case 'companyJobs':
-          mergeIndeedOptions('indeedCompanyJobsOptions');
-          break;
-        default:
-          break;
-      }
+      const indeedApiOptions = this.getNodeParameter('indeedApiOptions', index, {}) as IIndeedApiOptions;
 
       const addStringOption = (value: string | undefined, qsKey: string) => {
-        if (value) {
-          qsParams[qsKey] = value;
-        }
-      };
-
-      const addNumberOption = (value: number | undefined, qsKey: string) => {
-        if (typeof value === 'number' && value !== 0) {
-          qsParams[qsKey] = value;
-        }
+        if (value) qsParams[qsKey] = value;
       };
 
       addStringOption(indeedApiOptions.country, 'country');
       addStringOption(indeedApiOptions.tld, 'tld');
-
-      if (['jobSearch', 'companySearch', 'topCompanies', 'companyJobs'].includes(indeedApiType)) {
-        addStringOption(indeedApiOptions.location, 'location');
-      }
-
-      if (indeedApiType === 'topCompanies') {
-        addStringOption(indeedApiOptions.industry, 'industry');
-      }
-
-      if (['jobSearch', 'companyJobs'].includes(indeedApiType)) {
-        addStringOption(indeedApiOptions.job_type, 'job_type');
-        addStringOption(indeedApiOptions.salary, 'salary');
-        addStringOption(indeedApiOptions.remote, 'remote');
-        addNumberOption(indeedApiOptions.fromage, 'fromage');
-      }
-
-      if (['jobSearch', 'companySearch', 'topCompanies', 'companyReviews', 'companyJobs'].includes(indeedApiType)) {
-        addStringOption(indeedApiOptions.sort, 'sort');
-        addNumberOption(indeedApiOptions.start, 'start');
-      }
-
-      if (['jobSearch', 'companySearch', 'topCompanies', 'companyJobs'].includes(indeedApiType)) {
-        addNumberOption(indeedApiOptions.radius, 'radius');
-      }
     } else if (dataDomain === 'redfin') {
       const redfinApiType = this.getNodeParameter('redfinApiType', index) as string;
 
@@ -2435,7 +2535,8 @@ export class DataApi {
           baseUrl = `${API_BASE_URL}/structured-data/redfin/sale-detail`;
           const inputType = this.getNodeParameter('redfinSaleDetailInputType', index) as string;
           if (inputType === 'url') {
-            qsParams.url = this.getNodeParameter('redfinSaleDetailUrl', index) as string;
+            const url = this.getNodeParameter('redfinSaleDetailUrl', index) as string;
+            qsParams.url = url;
           } else {
             qsParams.state = this.getNodeParameter('redfinSaleDetailState', index) as string;
             qsParams.path = this.getNodeParameter('redfinSaleDetailPath', index) as string;
@@ -2447,7 +2548,8 @@ export class DataApi {
           baseUrl = `${API_BASE_URL}/structured-data/redfin/rent-detail`;
           const inputType = this.getNodeParameter('redfinRentDetailInputType', index) as string;
           if (inputType === 'url') {
-            qsParams.url = this.getNodeParameter('redfinRentDetailUrl', index) as string;
+            const url = this.getNodeParameter('redfinRentDetailUrl', index) as string;
+            qsParams.url = url;
           } else {
             qsParams.state = this.getNodeParameter('redfinRentDetailState', index) as string;
             qsParams.path = this.getNodeParameter('redfinRentDetailPath', index) as string;
@@ -2459,12 +2561,16 @@ export class DataApi {
           baseUrl = `${API_BASE_URL}/structured-data/redfin/building-detail`;
           const inputType = this.getNodeParameter('redfinBuildingDetailInputType', index) as string;
           if (inputType === 'url') {
-            qsParams.url = this.getNodeParameter('redfinBuildingDetailUrl', index) as string;
+            const url = this.getNodeParameter('redfinBuildingDetailUrl', index) as string;
+            qsParams.url = url;
           } else {
             qsParams.state = this.getNodeParameter('redfinBuildingDetailState', index) as string;
             qsParams.city = this.getNodeParameter('redfinBuildingDetailCity', index) as string;
             qsParams.building = this.getNodeParameter('redfinBuildingDetailBuilding', index) as string;
-            qsParams.building_type = this.getNodeParameter('redfinBuildingDetailBuildingType', index) as string;
+            const buildingType = this.getNodeParameter('redfinBuildingDetailBuildingType', index, '') as string;
+            if (buildingType) {
+              qsParams.building_type = buildingType;
+            }
             qsParams.building_id = this.getNodeParameter('redfinBuildingDetailBuildingId', index) as string;
           }
           break;
@@ -2473,7 +2579,8 @@ export class DataApi {
           baseUrl = `${API_BASE_URL}/structured-data/redfin/state-search`;
           const inputType = this.getNodeParameter('redfinStateSearchInputType', index) as string;
           if (inputType === 'url') {
-            qsParams.url = this.getNodeParameter('redfinStateSearchUrl', index) as string;
+            const url = this.getNodeParameter('redfinStateSearchUrl', index) as string;
+            qsParams.url = url;
           } else {
             qsParams.state = this.getNodeParameter('redfinStateSearchState', index) as string;
           }
@@ -2483,7 +2590,8 @@ export class DataApi {
           baseUrl = `${API_BASE_URL}/structured-data/redfin/agent-search`;
           const inputType = this.getNodeParameter('redfinAgentSearchInputType', index) as string;
           if (inputType === 'url') {
-            qsParams.url = this.getNodeParameter('redfinAgentSearchUrl', index) as string;
+            const url = this.getNodeParameter('redfinAgentSearchUrl', index) as string;
+            qsParams.url = url;
           } else {
             qsParams.city_id = this.getNodeParameter('redfinAgentSearchCityId', index) as string;
             qsParams.state = this.getNodeParameter('redfinAgentSearchState', index) as string;
@@ -2495,53 +2603,23 @@ export class DataApi {
           baseUrl = `${API_BASE_URL}/structured-data/redfin/agent-profile`;
           const inputType = this.getNodeParameter('redfinAgentProfileInputType', index) as string;
           if (inputType === 'url') {
-            qsParams.url = this.getNodeParameter('redfinAgentProfileUrl', index) as string;
+            const url = this.getNodeParameter('redfinAgentProfileUrl', index) as string;
+            qsParams.url = url;
           } else {
-            qsParams.agent = this.getNodeParameter('redfinAgentProfileAgent', index) as string;
+            const agentSlug = this.getNodeParameter('redfinAgentProfileAgent', index) as string;
+            qsParams.agent = agentSlug;
           }
           break;
         }
         default:
-          throw new NodeOperationError(this.getNode(), `Unsupported Redfin API type: ${redfinApiType}`, {
-            itemIndex: index,
-          });
+          throw new NodeOperationError(
+            this.getNode(),
+            `Unsupported Redfin API type: ${redfinApiType}`,
+            { itemIndex: index },
+          );
       }
 
-      const redfinApiOptions: IRedfinApiOptions = {};
-
-      const mergeRedfinOptions = (parameterName: string) => {
-        const extraOptions = this.getNodeParameter(parameterName, index, {}) as IRedfinApiOptions;
-        Object.assign(redfinApiOptions, extraOptions);
-      };
-
-      switch (redfinApiType) {
-        case 'saleSearch':
-          mergeRedfinOptions('redfinSaleSearchOptions');
-          break;
-        case 'rentSearch':
-          mergeRedfinOptions('redfinRentSearchOptions');
-          break;
-        case 'saleDetail':
-          mergeRedfinOptions('redfinSaleDetailOptions');
-          break;
-        case 'rentDetail':
-          mergeRedfinOptions('redfinRentDetailOptions');
-          break;
-        case 'buildingDetail':
-          mergeRedfinOptions('redfinBuildingDetailOptions');
-          break;
-        case 'stateSearch':
-          mergeRedfinOptions('redfinStateSearchOptions');
-          break;
-        case 'agentSearch':
-          mergeRedfinOptions('redfinAgentSearchOptions');
-          break;
-        case 'agentProfile':
-          mergeRedfinOptions('redfinAgentProfileOptions');
-          break;
-        default:
-          break;
-      }
+      const redfinApiOptions = this.getNodeParameter('redfinApiOptions', index, {}) as IRedfinApiOptions;
 
       if (redfinApiOptions.country) {
         qsParams.country = redfinApiOptions.country;
@@ -2550,7 +2628,11 @@ export class DataApi {
         qsParams.tld = redfinApiOptions.tld;
       }
     } else {
-      throw new NodeOperationError(this.getNode(), `Unsupported data domain: ${dataDomain}`, { itemIndex: index });
+      throw new NodeOperationError(
+        this.getNode(),
+        `Unsupported data domain: ${dataDomain}. Please select a supported domain.`,
+        { itemIndex: index },
+      );
     }
 
     const options: IRequestOptions = {
@@ -2561,17 +2643,27 @@ export class DataApi {
     };
 
     try {
-      const responseData = await this.helpers.requestWithAuthentication.call(this, 'scrapeOpsApi', options);
+      const responseData = await this.helpers.requestWithAuthentication.call(
+        this,
+        'scrapeOpsApi',
+        options,
+      );
       return responseData;
-    } catch (error) {
+    } catch (error: any) {
       if (error.response && error.response.body) {
+        const domainLabel = dataDomain
+          ? `${dataDomain.charAt(0).toUpperCase()}${dataDomain.slice(1)}`
+          : 'Data';
         throw new NodeOperationError(
           this.getNode(),
-          `ScrapeOps Data API request failed: ${error.response.body.message || error.message}`,
-          { itemIndex: index }
+          `ScrapeOps ${domainLabel} API request failed: ${
+            error.response.body.message || error.message
+          }`,
+          { itemIndex: index },
         );
       }
       throw error;
     }
   }
 }
+
