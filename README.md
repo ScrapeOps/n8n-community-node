@@ -321,6 +321,50 @@ Session Number: 12345
 2. Check that community nodes are enabled
 3. Verify the installation with: `npm list @scrapeops/n8n-nodes-scrapeops`
 
+### Local Development Setup
+
+1. **Install n8n globally**
+   ```bash
+   npm install n8n -g
+   ```
+
+2. **Navigate to your n8n data directory**
+   ```bash
+   cd ~/.n8n
+   ```
+
+3. **Create and enter a custom folder**
+   ```bash
+   mkdir -p custom
+   cd custom
+   ```
+
+4. **Initialize the workspace**
+   ```bash
+   npm init -y
+   ```
+
+5. **Build & pack the node (run inside the `n8n-community-node` repo)**
+   ```bash
+   # Install dependencies (use npm install for local dev or npm ci for clean installs)
+   npm install
+   # npm ci
+
+   # Build and create the tarball
+   npm run build
+   PKG=$(npm pack | tail -n1)
+   ```
+
+6. **Install the packed artifact into your custom folder that we created under .n8n**
+   ```bash
+   npm install --no-save "<PATH_TO_YOUR_REPO>/$PKG"
+   ```
+
+7. **Start n8n**
+  ```bash
+  n8n
+  ```   
+
 ### Authentication Failures
 **Problem:** "Invalid API Key" error
 
